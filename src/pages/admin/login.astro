@@ -40,7 +40,9 @@ const error = Astro.url.searchParams.get('error');
     <!-- Error alert -->
     {error && (
       <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
-        Nama pengguna atau kata sandi salah.
+        {error === 'locked'
+          ? 'Terlalu banyak percobaan masuk. Silakan coba lagi dalam beberapa menit.'
+          : 'Nama pengguna atau kata sandi salah.'}
       </div>
     )}
 

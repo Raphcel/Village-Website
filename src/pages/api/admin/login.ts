@@ -24,12 +24,25 @@ export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => 
     return redirect('/admin/login?error=1');
   }
 
+  // ── Rate limiting: max 5 failed attempts per IP in a 15-minute window ──
+  const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  const rlKey = `ratelimit:login:${ip}`;
+  const attempts = parseInt((await env.SESSION_KV.get(rlKey)) ?? '0', 10);
+  if (attempts >= 5) {
+    return redirect('/admin/login?error=locked');
+  }
+
   const row = await env.DB.prepare('SELECT password_hash FROM admin_user WHERE username = ?')
     .bind(username).first<{ password_hash: string }>();
 
   if (!row || !(await verifyPassword(password, row.password_hash))) {
+    // Re-putting refreshes the TTL, so repeated tries extend the lockout window.
+    await env.SESSION_KV.put(rlKey, String(attempts + 1), { expirationTtl: 900 });
     return redirect('/admin/login?error=1');
   }
+
+  // Successful login clears the failure counter for this IP.
+  await env.SESSION_KV.delete(rlKey);
 
   const sessionId = generateSessionId();
   await createSession(sessionId, username, env.SESSION_KV);

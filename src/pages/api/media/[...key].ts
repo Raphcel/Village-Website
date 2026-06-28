@@ -7,7 +7,13 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   if (!env || !key) return new Response('Not found', { status: 404 });
 
-  const obj = await env.MEDIA_BUCKET.get(decodeURIComponent(key));
+  // Only public uploads live under `media/`. Everything else in the bucket
+  // (e.g. `backups/` DB dumps containing admin password hashes) must never be
+  // served through this unauthenticated endpoint.
+  const decodedKey = decodeURIComponent(key);
+  if (!decodedKey.startsWith('media/')) return new Response('Not found', { status: 404 });
+
+  const obj = await env.MEDIA_BUCKET.get(decodedKey);
   if (!obj) return new Response('Not found', { status: 404 });
 
   const headers = new Headers();
