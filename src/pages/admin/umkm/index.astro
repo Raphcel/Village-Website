@@ -1,0 +1,85 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllUmkm } from '../../../lib/db/umkm';
+
+import { getEnv } from '@lib/env';
+const env = getEnv();
+const umkmList = env ? await getAllUmkm(env.DB) : [];
+const deleted = Astro.url.searchParams.get('deleted');
+---
+
+<AdminLayout title="Kelola UMKM" breadcrumb="UMKM">
+
+  {deleted && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      UMKM berhasil dihapus.
+    </div>
+  )}
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Direktori UMKM</h2>
+    <a href="/admin/umkm/new"
+      class="px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+      style="background:var(--color-cta); min-height:44px; display:flex; align-items:center;">
+      + Tambah UMKM Baru
+    </a>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+    {umkmList.length === 0 ? (
+      <div class="p-8 text-center text-text-muted">Belum ada UMKM terdaftar.</div>
+    ) : (
+      <table class="w-full text-sm">
+        <thead style="background:#F8FAFC;">
+          <tr class="border-b border-border">
+            <th class="text-left px-4 py-3 font-heading font-semibold">Nama</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Kategori</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Status</th>
+            <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {umkmList.map((u) => (
+            <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
+              <td class="px-4 py-3 font-medium">{u.nama}</td>
+              <td class="px-4 py-3 hidden md:table-cell">
+                <span class:list={['inline-flex px-2 py-0.5 rounded-full text-xs font-medium',
+                  u.kategori === 'Kuliner' ? 'bg-orange-100 text-orange-700' :
+                  u.kategori === 'Kriya'   ? 'bg-purple-100 text-purple-700' :
+                  u.kategori === 'Jasa'    ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700']}>
+                  {u.kategori}
+                </span>
+              </td>
+              <td class="px-4 py-3 hidden md:table-cell">
+                <span class:list={['inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium',
+                  u.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600']}>
+                  <span class:list={['w-1.5 h-1.5 rounded-full', u.status === 'published' ? 'bg-green-500' : 'bg-gray-400']} aria-hidden="true"></span>
+                  {u.status === 'published' ? 'Terbit' : 'Draf'}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-2">
+                  <a href={`/admin/umkm/${u.id}`}
+                    class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border transition-colors hover:bg-primary hover:text-white"
+                    style="border-color:var(--color-primary); color:var(--color-primary);">
+                    Sunting
+                  </a>
+                  <form method="POST" action="/api/admin/umkm/delete"
+                    onsubmit="return confirm('Hapus UMKM ini? Tindakan tidak dapat dibatalkan.')">
+                    <input type="hidden" name="id" value={String(u.id)} />
+                    <button type="submit"
+                      class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600"
+                      style="border-color:#FECACA; color:#DC2626;">
+                      Hapus
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+</AdminLayout>

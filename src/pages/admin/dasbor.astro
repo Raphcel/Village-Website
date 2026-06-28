@@ -1,0 +1,55 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+
+import { getEnv } from '@lib/env';
+const env = getEnv();
+let stats = { wisata: 0, umkm: 0, berita: 0 };
+if (env) {
+  const [w, u, b] = await Promise.all([
+    env.DB.prepare("SELECT COUNT(*) as c FROM wisata WHERE status='published'").first<{c:number}>(),
+    env.DB.prepare("SELECT COUNT(*) as c FROM umkm WHERE status='published'").first<{c:number}>(),
+    env.DB.prepare("SELECT COUNT(*) as c FROM berita WHERE status='published'").first<{c:number}>(),
+  ]);
+  stats = { wisata: w?.c ?? 0, umkm: u?.c ?? 0, berita: b?.c ?? 0 };
+}
+
+const user = Astro.locals.user?.username ?? 'Pengelola';
+---
+
+<AdminLayout title="Dasbor" breadcrumb="Dasbor">
+
+  <h2 class="font-heading font-bold text-2xl mb-1" style="color:var(--color-primary);">Selamat datang, {user}!</h2>
+  <p class="text-text-muted mb-8">Kelola konten Web Desa Loji dari sini.</p>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    {[
+      { label: 'Wisata Terbit', value: stats.wisata, href: '/admin/wisata' },
+      { label: 'UMKM Terbit',  value: stats.umkm,   href: '/admin/umkm' },
+      { label: 'Berita Terbit', value: stats.berita, href: '/admin/berita' },
+    ].map(({ label, value, href }) => (
+      <a href={href} class="bg-white rounded-xl p-5 flex flex-col gap-1 border border-border hover:border-accent transition-colors" style="box-shadow:var(--shadow-sm);">
+        <span class="text-text-muted text-sm font-heading">{label}</span>
+        <span class="font-heading font-bold text-3xl" style="color:var(--color-primary);">{value}</span>
+      </a>
+    ))}
+  </div>
+
+  <!-- Quick actions -->
+  <h3 class="font-heading font-semibold text-lg mb-4" style="color:var(--color-primary);">Aksi Cepat</h3>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    {[
+      { label: 'Tulis Berita Baru', href: '/admin/berita/new', color: 'var(--color-cta)' },
+      { label: 'Tambah UMKM',       href: '/admin/umkm/new',   color: 'var(--color-primary)' },
+      { label: 'Tambah Wisata',     href: '/admin/wisata/new', color: 'var(--color-primary)' },
+      { label: 'Edit Konten Halaman', href: '/admin/konten',   color: 'var(--color-accent)' },
+    ].map(({ label, href, color }) => (
+      <a href={href}
+        class="block rounded-lg px-4 py-3 font-heading font-semibold text-white text-sm text-center transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+        style={`background:${color}; min-height:44px; line-height:1.4; display:flex; align-items:center; justify-content:center;`}>
+        {label}
+      </a>
+    ))}
+  </div>
+
+</AdminLayout>

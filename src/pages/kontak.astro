@@ -1,0 +1,78 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout
+  title="Kontak & Info — Desa Loji"
+  description="Alamat, telepon, email, dan kanal resmi Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi."
+>
+
+<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary">Kontak & Info Desa</h1>
+  <p class="text-muted mt-2 max-w-xl">Hubungi Pemerintah Desa Loji melalui kanal resmi berikut.</p>
+
+  <div class="grid lg:grid-cols-2 gap-6 mt-8">
+    <!-- Info cards -->
+    <div class="space-y-4">
+      {[
+        { icon: 'map-pin', title: 'Alamat Kantor', content: 'Kantor Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat' },
+        { icon: 'phone', title: 'Telepon', content: '(0266) 000-0000' },
+        { icon: 'mail', title: 'Email', content: 'desaloji@email.desa.id' },
+        { icon: 'clock', title: 'Jam Layanan', content: 'Senin–Jumat, 08.00–15.00 WIB' },
+      ].map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 flex gap-4 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+          <span class="w-11 h-11 rounded-full bg-sand grid place-items-center text-primary shrink-0">
+            <i data-lucide={item.icon} class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h2 class="font-heading font-semibold text-ink">{item.title}</h2>
+            <p class="text-muted mt-0.5">{item.content}</p>
+          </div>
+        </div>
+      ))}
+
+      <!-- Kanal resmi -->
+      <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <h2 class="font-heading font-semibold text-ink">Kanal Resmi</h2>
+        <div class="flex flex-wrap gap-3 mt-3">
+          <a href="#" aria-label="WhatsApp resmi desa"
+             class="inline-flex items-center gap-2 bg-cta hover:bg-ctaDark text-white font-heading font-semibold px-4 py-2.5 rounded-lg transition-colors min-h-[44px]">
+            <i data-lucide="message-circle" class="w-5 h-5"></i> WhatsApp
+          </a>
+          <a href="#" aria-label="Facebook resmi desa"
+             class="inline-flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white font-heading font-semibold px-4 py-2.5 rounded-lg transition-colors min-h-[44px]">
+            <i data-lucide="facebook" class="w-5 h-5"></i> Facebook
+          </a>
+          <a href="#" aria-label="Instagram resmi desa"
+             class="inline-flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white font-heading font-semibold px-4 py-2.5 rounded-lg transition-colors min-h-[44px]">
+            <i data-lucide="instagram" class="w-5 h-5"></i> Instagram
+          </a>
+        </div>
+        <p class="text-xs text-muted mt-3">Tanpa formulir kontak — silakan hubungi langsung lewat kanal di atas.</p>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="relative rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] border border-line min-h-[20rem]">
+      <div id="kontak-map" class="w-full h-full absolute inset-0"></div>
+      <a href="/peta"
+         class="absolute bottom-4 right-4 inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-4 py-2 rounded-lg shadow-[0_4px_10px_rgba(15,36,51,.12)] z-10 hover:bg-sand transition-colors">
+        <i data-lucide="map" class="w-5 h-5"></i> Buka Peta Desa
+      </a>
+    </div>
+  </div>
+</main>
+
+</Layout>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('kontak-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Kantor Desa Loji</b><br>Kec. Simpenan, Sukabumi');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
+</script>

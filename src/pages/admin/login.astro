@@ -1,0 +1,96 @@
+---
+import '../../styles/global.css';
+import { getEnv } from '@lib/env';
+
+// If already logged in, redirect to dasbor
+const sessionId = Astro.cookies.get('dl_session')?.value;
+if (sessionId) {
+  const env = getEnv();
+  if (env) {
+    const { validateSession } = await import('../../lib/auth/session');
+    const user = await validateSession(sessionId, env.SESSION_KV);
+    if (user) return Astro.redirect('/admin/dasbor');
+  }
+}
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Masuk — Panel Admin Desa Loji</title>
+  <meta name="robots" content="noindex,nofollow" />
+</head>
+<body class="font-body min-h-screen flex items-center justify-center" style="background:#F1F5F9;">
+
+  <div class="w-full max-w-sm mx-4">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex w-14 h-14 rounded-full items-center justify-center mb-3 font-heading font-bold text-white text-lg" style="background:#0A3650;" aria-hidden="true">DL</div>
+      <h1 class="font-heading font-bold text-xl" style="color:#0A3650;">Panel Admin</h1>
+      <p class="text-text-muted text-sm mt-1">Pemerintah Desa Loji</p>
+    </div>
+
+    <!-- Error alert -->
+    {error && (
+      <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+        Nama pengguna atau kata sandi salah.
+      </div>
+    )}
+
+    <!-- Login form -->
+    <form method="POST" action="/api/admin/login" class="bg-white rounded-xl p-6" style="box-shadow:var(--shadow-md);">
+      <div class="space-y-4">
+        <div>
+          <label for="username" class="block font-heading font-medium text-sm mb-1.5" style="color:var(--color-text);">
+            Nama Pengguna <span aria-label="wajib">*</span>
+            <span class="font-normal text-text-muted">(wajib)</span>
+          </label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            autocomplete="username"
+            class="w-full rounded-lg border px-4 py-3 text-base font-body transition-colors duration-150 focus:outline-none focus-visible:ring-2"
+            style="border-color:var(--color-border); min-height:44px; --tw-ring-color:var(--color-accent);"
+          />
+        </div>
+        <div>
+          <label for="password" class="block font-heading font-medium text-sm mb-1.5" style="color:var(--color-text);">
+            Kata Sandi <span aria-label="wajib">*</span>
+            <span class="font-normal text-text-muted">(wajib)</span>
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            class="w-full rounded-lg border px-4 py-3 text-base font-body transition-colors duration-150 focus:outline-none focus-visible:ring-2"
+            style="border-color:var(--color-border); min-height:44px; --tw-ring-color:var(--color-accent);"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded-lg font-heading font-semibold text-white py-3 transition-colors duration-150 cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+          style="background:var(--color-cta); min-height:44px;"
+        >
+          Masuk
+        </button>
+      </div>
+    </form>
+
+    <p class="text-center text-xs text-text-muted mt-6">
+      Belum punya akun? <a href="/admin/setup" class="text-accent hover:underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent rounded">Buat akun pertama</a>
+    </p>
+  </div>
+
+</body>
+</html>

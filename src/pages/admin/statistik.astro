@@ -1,0 +1,50 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+---
+
+<AdminLayout title="Statistik" breadcrumb="Statistik">
+
+  <h2 class="font-heading font-bold text-xl mb-6" style="color:var(--color-primary);">Statistik Kunjungan</h2>
+
+  <div class="bg-white rounded-xl border border-border p-6 mb-6" style="box-shadow:var(--shadow-sm);">
+    <p class="text-text-muted text-sm mb-4">
+      Statistik kunjungan diambil dari <strong>Cloudflare Web Analytics</strong>.
+      Data tersedia setelah situs di-deploy ke Cloudflare dan beacon analitik aktif.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      {[
+        { label: '7 Hari Terakhir — Kunjungan', value: '—' },
+        { label: '30 Hari Terakhir — Kunjungan', value: '—' },
+        { label: 'Semua Waktu — Kunjungan', value: '—' },
+      ].map(({ label, value }) => (
+        <div class="rounded-xl border border-border p-4" style="background:#F8FAFC;">
+          <p class="text-text-muted text-xs font-heading mb-1">{label}</p>
+          <p class="font-heading font-bold text-3xl" style="color:var(--color-primary);">{value}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="rounded-xl border border-border p-4 text-center" style="background:#F8FAFC; min-height:200px; display:flex; align-items:center; justify-content:center;">
+      <div>
+        <p class="text-text-muted text-sm">Grafik kunjungan akan tampil di sini setelah deploy ke Cloudflare.</p>
+        <a href="https://dash.cloudflare.com" target="_blank" rel="noopener"
+          class="inline-block mt-3 px-4 py-2 rounded-lg font-heading font-medium text-sm text-white"
+          style="background:var(--color-accent);">
+          Buka Cloudflare Dashboard ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+    <h3 class="font-heading font-semibold text-base mb-3" style="color:var(--color-primary);">Ekspor & Backup</h3>
+    <p class="text-text-muted text-sm mb-4">Unduh seluruh konten database sebagai file JSON.</p>
+    <a href="/api/admin/export"
+      class="inline-block px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm"
+      style="background:var(--color-primary);">
+      Ekspor Semua Konten (JSON)
+    </a>
+  </div>
+
+</AdminLayout>

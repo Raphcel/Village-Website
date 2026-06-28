@@ -1,0 +1,69 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Potensi Pariwisata — Desa Loji"
+  description="Potensi pariwisata pesisir Desa Loji: Pantai Loji, Kuil Dewi Kwan Im, dan Geopark Ciletuh UNESCO."
+>
+
+<section class="relative">
+  <div class="h-48 sm:h-64 overflow-hidden">
+    <img
+      src="/images/pantai_loji.png"
+      alt="Wisata pantai Desa Loji"
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
+  <div class="absolute inset-0 flex items-end">
+    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
+      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
+        <a href="/" class="hover:text-white">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/potensi" class="hover:text-white">Potensi</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="font-medium">Pariwisata</span>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Pariwisata Pesisir</h1>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
+  <div class="max-w-3xl space-y-6">
+    <p class="text-lg text-muted leading-relaxed">
+      Desa Loji menjadi pintu masuk utama Geopark Ciletuh — kawasan geopark pertama di Jawa yang mendapat pengakuan dari UNESCO Global Geoparks. Posisi ini menempatkan Loji sebagai titik penting dalam peta wisata Jawa Barat.
+    </p>
+    <p class="text-muted leading-relaxed">
+      Dari Pantai Loji dengan pasir hitam vulkaniknya, Kuil Dewi Kwan Im yang ikonik di tepi pantai, hingga tebing karang yang sempurna untuk menyaksikan matahari terbenam — setiap sudut desa menyimpan daya tarik wisata yang unik.
+    </p>
+    <div class="grid sm:grid-cols-3 gap-4 mt-6">
+      {[
+        { icon: 'palmtree', label: 'Destinasi', value: '6+' },
+        { icon: 'users', label: 'Pengunjung/Tahun', value: 'Ribuan' },
+        { icon: 'globe', label: 'Status Geopark', value: 'UNESCO' },
+      ].map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)] text-center">
+          <i data-lucide={item.icon} class="w-8 h-8 text-accent mx-auto"></i>
+          <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
+          <p class="text-sm text-muted mt-0.5">{item.label}</p>
+        </div>
+      ))}
+    </div>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="/wisata" class="inline-flex items-center gap-2 bg-accent text-white font-heading font-semibold px-5 py-3 rounded-lg hover:bg-[#0a7d88] transition-colors">
+        <i data-lucide="compass" class="w-5 h-5"></i> Jelajahi Destinasi
+      </a>
+      <a href="/kontak" class="inline-flex items-center gap-2 border-2 border-primary text-primary font-heading font-semibold px-5 py-3 rounded-lg hover:bg-primary hover:text-white transition-colors">
+        <i data-lucide="handshake" class="w-5 h-5"></i> Jalin Kemitraan
+      </a>
+    </div>
+  </div>
+</main>
+
+</Layout>
+
+<script is:inline>
+  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
+</script>

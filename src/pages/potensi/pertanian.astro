@@ -1,0 +1,66 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Potensi Pertanian — Desa Loji"
+  description="Potensi pertanian dan perkebunan Desa Loji: kopi, kelapa, palawija, dan peluang kemitraan."
+>
+
+<section class="relative">
+  <div class="h-48 sm:h-64 overflow-hidden">
+    <img
+      src="/images/kebun_sayur.png"
+      alt="Lahan pertanian Desa Loji"
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
+  <div class="absolute inset-0 flex items-end">
+    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
+      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
+        <a href="/" class="hover:text-white">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/potensi" class="hover:text-white">Potensi</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="font-medium">Pertanian</span>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Pertanian & Perkebunan</h1>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
+  <div class="max-w-3xl space-y-6">
+    <p class="text-lg text-muted leading-relaxed">
+      Selain kekayaan laut, Desa Loji juga memiliki potensi pertanian dan perkebunan yang signifikan di kawasan perbukitan. Komoditas utama meliputi kopi robusta, kelapa, dan berbagai palawija yang tumbuh subur di tanah vulkanik desa.
+    </p>
+    <p class="text-muted leading-relaxed">
+      Kopi Kebun Loji menjadi salah satu produk unggulan yang kini mulai dikenal di luar desa. Dengan pendampingan yang tepat, potensi pertanian ini dapat menjadi basis kemitraan yang menguntungkan antara petani lokal dan pasar yang lebih luas.
+    </p>
+    <div class="grid sm:grid-cols-3 gap-4 mt-6">
+      {[
+        { icon: 'coffee', label: 'Kopi', value: 'Robusta' },
+        { icon: 'leaf', label: 'Komoditas', value: '5+' },
+        { icon: 'map', label: 'Lahan Produktif', value: '±500 ha' },
+      ].map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)] text-center">
+          <i data-lucide={item.icon} class="w-8 h-8 text-cta mx-auto"></i>
+          <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
+          <p class="text-sm text-muted mt-0.5">{item.label}</p>
+        </div>
+      ))}
+    </div>
+    <div class="mt-6">
+      <a href="/kontak" class="inline-flex items-center gap-2 bg-cta text-white font-heading font-semibold px-5 py-3 rounded-lg hover:bg-ctaDark transition-colors">
+        <i data-lucide="handshake" class="w-5 h-5"></i> Hubungi untuk Kemitraan
+      </a>
+    </div>
+  </div>
+</main>
+
+</Layout>
+
+<script is:inline>
+  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
+</script>

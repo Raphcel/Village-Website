@@ -1,0 +1,181 @@
+---
+import Layout from '../components/Layout.astro';
+import { getSection } from '../lib/db/page-section';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const [umum, geografis, sejarah] = await Promise.all([
+  env ? getSection('profil-umum', env.DB) : null,
+  env ? getSection('profil-geografis', env.DB) : null,
+  env ? getSection('profil-sejarah', env.DB) : null,
+]);
+---
+
+<Layout
+  title="Profil Desa — Desa Loji"
+  description="Profil lengkap Desa Loji: sejarah, kondisi geografis, visi misi, dan gambaran desa pesisir Kecamatan Simpenan Sukabumi."
+>
+
+<!-- Hero -->
+<section class="relative">
+  <div class="h-48 sm:h-64 overflow-hidden">
+    <img
+      src="/images/pantai_loji.png"
+      alt="Pantai dan alam Desa Loji"
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <div class="absolute inset-0" style="background: rgba(10,54,80,0.6);"></div>
+  <div class="absolute inset-0 flex items-end">
+    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
+      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
+        <a href="/" class="hover:text-white">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="font-medium">Profil Desa</span>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Profil Desa Loji</h1>
+      <p class="text-white/85 mt-1 max-w-xl">Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat</p>
+    </div>
+  </div>
+</section>
+
+<!-- Sticky subnav -->
+<div class="subnav sticky top-16 z-30 bg-white border-b border-line" style="scroll-behavior:smooth;">
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-2 flex gap-2 overflow-x-auto">
+    {[
+      ['#umum', 'Umum'],
+      ['#geografis', 'Geografis'],
+      ['#sejarah', 'Sejarah'],
+      ['#peta', 'Peta'],
+      ['/pemerintahan', 'Pemerintahan ↗'],
+    ].map(([href, label]) => (
+      <a
+        href={href}
+        class="whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors"
+      >
+        {label}
+      </a>
+    ))}
+  </div>
+</div>
+
+<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10 space-y-14">
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    {[
+      { icon: 'users', label: 'Penduduk', value: '±4.500', sub: 'Jiwa' },
+      { icon: 'layers', label: 'Wilayah', value: '±2.500', sub: 'Hektar' },
+      { icon: 'home', label: 'Dusun', value: '5', sub: 'Wilayah' },
+      { icon: 'store', label: 'UMKM', value: '12+', sub: 'Terdaftar' },
+    ].map(s => (
+      <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <i data-lucide={s.icon} class="w-6 h-6 text-accent"></i>
+        <p class="font-heading font-extrabold text-2xl text-primary mt-2">{s.value}</p>
+        <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{s.sub}</p>
+        <p class="text-sm text-ink mt-0.5">{s.label}</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Umum -->
+  <section id="umum" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Profil Umum</h2>
+    <p class="text-muted mt-2 max-w-3xl leading-relaxed">
+      Desa Loji adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai salah satu pintu masuk menuju kawasan Geopark Ciletuh — geopark pertama di Jawa yang diakui oleh UNESCO Global Geoparks.
+    </p>
+    <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={umum?.content_html ?? ''} />
+    <div class="grid sm:grid-cols-2 gap-4 mt-6">
+      {[
+        { label: 'Kecamatan', value: 'Simpenan' },
+        { label: 'Kabupaten', value: 'Sukabumi' },
+        { label: 'Provinsi', value: 'Jawa Barat' },
+        { label: 'Kode Pos', value: '43179' },
+      ].map(row => (
+        <div class="flex justify-between py-3 border-b border-line">
+          <span class="font-heading font-semibold text-ink">{row.label}</span>
+          <span class="text-muted">{row.value}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Geografis -->
+  <section id="geografis" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Kondisi Geografis</h2>
+    <p class="text-muted mt-2 max-w-3xl leading-relaxed">
+      Secara geografis, Desa Loji berada di koordinat sekitar -7.059° LS, 106.578° BT. Wilayahnya meliputi kawasan pantai, bukit, dan hutan pesisir. Topografi bervariasi dari dataran rendah di pinggir pantai hingga perbukitan yang menjorok ke dalam.
+    </p>
+    <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={geografis?.content_html ?? ''} />
+    <div class="grid sm:grid-cols-3 gap-4 mt-6">
+      {[
+        { icon: 'mountain', label: 'Ketinggian', value: '0–250 m dpl' },
+        { icon: 'thermometer', label: 'Iklim', value: 'Tropis Basah' },
+        { icon: 'waves', label: 'Garis Pantai', value: '±8 km' },
+      ].map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+          <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
+          <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
+          <p class="font-heading font-bold text-xl text-primary mt-0.5">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Sejarah -->
+  <section id="sejarah" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Sejarah Desa</h2>
+    <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={sejarah?.content_html ?? `
+      <p>Desa Loji memiliki sejarah panjang sebagai perkampungan nelayan di tepi Samudra Hindia. Nama "Loji" diyakini berasal dari bangunan loji peninggalan masa kolonial yang pernah berdiri di kawasan ini. Masyarakat desa secara turun-temurun hidup dari hasil laut dan pertanian pesisir.</p>
+      <p>Posisi strategis Desa Loji sebagai gerbang Geopark Ciletuh mulai membuka babak baru bagi perekonomian desa, dengan pariwisata menjadi sektor yang terus berkembang di samping perikanan tradisional yang menjadi tulang punggung.</p>
+    `} />
+  </section>
+
+  <!-- Peta -->
+  <section id="peta" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Peta Desa</h2>
+    <p class="text-muted mt-2">Lokasi Desa Loji di Kecamatan Simpenan, Kabupaten Sukabumi.</p>
+    <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]" style="height: 380px;"></div>
+    <p class="text-sm text-muted mt-2 flex items-center gap-1.5">
+      <i data-lucide="info" class="w-4 h-4"></i>
+      Koordinat: -7.059, 106.578 ·
+      <a href="/peta" class="text-accent hover:underline font-medium">Buka peta interaktif lengkap →</a>
+    </p>
+  </section>
+
+  <!-- CTA Pemerintahan -->
+  <section style="scroll-margin-top: 120px;">
+    <div class="bg-primary text-white rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-6">
+      <div class="flex-1">
+        <h2 class="text-2xl font-heading font-extrabold">Pemerintahan Desa</h2>
+        <p class="text-white/80 mt-2">Pelajari struktur organisasi, perangkat desa, visi misi, dan tugas fungsi pemerintahan Desa Loji.</p>
+      </div>
+      <a href="/pemerintahan" class="inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-6 py-3 rounded-lg hover:bg-sand transition-colors min-h-[44px] shrink-0">
+        <i data-lucide="landmark" class="w-5 h-5"></i> Lihat Pemerintahan
+      </a>
+    </div>
+  </section>
+
+</main>
+
+</Layout>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Desa Loji</b><br>Kec. Simpenan, Sukabumi');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+  setTimeout(function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }, 300);
+</script>
+
+<style>
+  .prose p { margin: .5rem 0; line-height: 1.75; }
+  .prose h3 { font-family: 'Lexend', sans-serif; font-weight: 700; color: #0E4A6E; margin: 1rem 0 .5rem; }
+  [id] { scroll-margin-top: 120px; }
+</style>

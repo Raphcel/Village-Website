@@ -1,0 +1,42 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllMedia } from '../../../lib/db/media';
+
+import { getEnv } from '@lib/env';
+const env = getEnv();
+const mediaList = env ? await getAllMedia(env.DB) : [];
+---
+
+<AdminLayout title="Media" breadcrumb="Media">
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Perpustakaan Media</h2>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+    <p class="text-text-muted text-sm mb-4">
+      Upload gambar dilakukan langsung dari form wisata, UMKM, dan berita. Total file tersimpan: <strong>{mediaList.length}</strong>
+    </p>
+
+    {mediaList.length === 0 ? (
+      <p class="text-center text-text-muted py-8">Belum ada media yang diunggah.</p>
+    ) : (
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {mediaList.map(m => (
+          <div class="aspect-square rounded-lg overflow-hidden border border-border bg-sand/30 relative group">
+            <img
+              src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`}
+              alt={m.alt}
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-1.5">
+              <p class="text-white text-xs leading-tight line-clamp-2">{m.alt}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+
+</AdminLayout>

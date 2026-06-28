@@ -1,0 +1,8 @@
+# Local development environment variables
+# Copy this file to .dev.vars and fill in values for local dev
+# NEVER commit .dev.vars to git
+#
+# For production secrets, use: wrangler secret put SECRET_NAME
+
+# Example (uncomment and fill if needed for local dev):
+# ADMIN_SECRET=your-local-dev-secret-here

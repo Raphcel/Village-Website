@@ -1,0 +1,175 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getPublishedUmkm } from '../../lib/db/umkm';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const allUmkm = env ? await getPublishedUmkm(env.DB) : [];
+
+const demoUmkm = [
+  { slug: 'sambal-ikan-loji', nama: 'Sambal Ikan Loji', kategori: 'Kuliner', lokasi: 'Kp. Cibutun', img: '/images/ikan_bakar.png', wa_number: '6281234567890', desc: 'Olahan sambal ikan khas pesisir, pedas dan segar.' },
+  { slug: 'kerupuk-ikan-bu-eni', nama: 'Kerupuk Ikan Bu Eni', kategori: 'Kuliner', lokasi: 'Kp. Loji', img: '/images/ikan_bakar.png', wa_number: '6281234567891', desc: 'Camilan kerupuk ikan renyah khas Desa Loji.' },
+  { slug: 'kopi-kebun-loji', nama: 'Kopi Kebun Loji', kategori: 'Hasil Tani', lokasi: 'Kp. Cikadal', img: '/images/kebun_sayur.png', wa_number: null, desc: 'Biji kopi hasil kebun setempat dengan cita rasa khas.' },
+  { slug: 'anyaman-bambu-diding', nama: 'Anyaman Bambu Pak Diding', kategori: 'Kriya', lokasi: 'Kp. Loji', img: '/images/kerajinan_bambu.png', wa_number: '6281234567892', desc: 'Kerajinan anyaman bambu tangan bermotif khas tradisi.' },
+  { slug: 'batik-pesisir-loji', nama: 'Batik Pesisir Loji', kategori: 'Kriya', lokasi: 'Kp. Cibutun', img: '/images/kerajinan_bambu.png', wa_number: '6281234567893', desc: 'Kain batik motif laut dan geopark khas Desa Loji.' },
+  { slug: 'warung-seafood-mbak-sari', nama: 'Warung Seafood Mbak Sari', kategori: 'Kuliner', lokasi: 'Pantai Loji', img: '/images/ikan_bakar.png', wa_number: '6281234567894', desc: 'Hidangan laut segar tepi pantai dengan view langsung ke laut.' },
+  { slug: 'jasa-pemandu-wisata', nama: 'Jasa Pemandu Wisata Loji', kategori: 'Jasa', lokasi: 'Balai Desa', img: '/images/pantai_loji.png', wa_number: '6281234567895', desc: 'Pemandu lokal berpengalaman ke Geopark Ciletuh dan sekitarnya.' },
+  { slug: 'homestay-bahari', nama: 'Homestay Bahari', kategori: 'Jasa', lokasi: 'Kp. Loji', img: '/images/pantai_loji.png', wa_number: '6281234567896', desc: 'Penginapan sederhana dekat pantai dengan suasana desa nelayan.' },
+  { slug: 'madu-hutan-simpenan', nama: 'Madu Hutan Simpenan', kategori: 'Hasil Tani', lokasi: 'Kp. Cikadal', img: '/images/kebun_sayur.png', wa_number: '6281234567897', desc: 'Madu murni asli dari lebah hutan di kawasan perbukitan.' },
+  { slug: 'ikan-asin-nelayan', nama: 'Ikan Asin Nelayan Loji', kategori: 'Hasil Tani', lokasi: 'Pantai Loji', img: '/images/ikan_bakar.png', wa_number: '6281234567898', desc: 'Ikan asin segar hasil tangkapan nelayan langsung dari Pantai Loji.' },
+  { slug: 'keripik-pisang-bu-wati', nama: 'Keripik Pisang Bu Wati', kategori: 'Kuliner', lokasi: 'Kp. Cikadal', img: '/images/kebun_sayur.png', wa_number: '6281234567899', desc: 'Keripik pisang aneka rasa hasil olahan rumahan.' },
+  { slug: 'tenun-souvenir-loji', nama: 'Tenun Souvenir Loji', kategori: 'Kriya', lokasi: 'Kp. Cibutun', img: '/images/kerajinan_bambu.png', wa_number: null, desc: 'Suvenir tenun khas desa dengan motif pesisir Sukabumi.' },
+];
+
+const getUmkmImg = (slug: string) => {
+  if (slug === 'kerajinan-bambu-loji') return '/images/kerajinan_bambu.png';
+  if (slug === 'warung-ikan-bakar-bu-sari') return '/images/ikan_bakar.png';
+  if (slug === 'kebun-sayur-pak-budi') return '/images/kebun_sayur.png';
+  return '/images/kerajinan_bambu.png';
+};
+
+const displayUmkm = allUmkm.length > 0
+  ? allUmkm.map(u => ({ slug: u.slug, nama: u.nama, kategori: u.kategori, lokasi: u.lokasi ?? '', img: getUmkmImg(u.slug), wa_number: u.wa_number ?? null, desc: '' }))
+  : demoUmkm;
+
+const displayJson = JSON.stringify(displayUmkm);
+const totalCount = displayUmkm.length;
+---
+
+<Layout
+  title="Direktori UMKM — Desa Loji"
+  description="Direktori UMKM Desa Loji: temukan produk kuliner, kriya, jasa, dan hasil tani lokal beserta kontak langsung."
+>
+
+<!-- Sticky header with search/filter -->
+<div id="filterbar" class="sticky top-16 z-30 bg-white border-b border-line shadow-[0_4px_12px_rgba(15,36,51,.08)]">
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-3">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-3">
+      <div class="relative lg:w-72 shrink-0">
+        <i data-lucide="search" class="w-5 h-5 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <label for="umkm-search" class="sr-only">Cari UMKM berdasarkan nama</label>
+        <input id="umkm-search" type="search" placeholder="Cari nama UMKM…"
+          class="w-full pl-10 pr-3 py-2.5 min-h-[44px] text-base border border-line rounded-lg focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/25" />
+      </div>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Saring berdasarkan kategori">
+        {['Semua', 'Kuliner', 'Kriya', 'Jasa', 'Hasil Tani'].map((cat, i) => (
+          <button
+            data-cat={cat.toLowerCase().replace(' ', '-')}
+            data-cat-label={cat}
+            class:list={[
+              'chip-filter px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border-2 transition-colors',
+              i === 0 ? 'border-primary bg-primary text-white is-active' : 'border-line text-ink hover:border-accent'
+            ]}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+      <p id="count" class="text-sm text-muted lg:ml-auto shrink-0" aria-live="polite">Menampilkan {totalCount} UMKM</p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-4 pb-2">
+    <nav aria-label="Breadcrumb" class="text-sm text-muted flex items-center gap-1.5">
+      <a href="/" class="hover:text-accent">Beranda</a>
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      <span class="text-ink font-medium">Direktori UMKM</span>
+    </nav>
+    <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Direktori UMKM</h1>
+    <p class="text-muted text-lg mt-2 max-w-2xl">Produk lokal dari pelaku usaha Desa Loji. Temukan, lihat detail, lalu hubungi langsung.</p>
+  </div>
+
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+
+    <div id="empty" class="hidden text-center py-20">
+      <div class="w-14 h-14 mx-auto rounded-full bg-sand grid place-items-center">
+        <i data-lucide="search-x" class="w-7 h-7 text-primary"></i>
+      </div>
+      <h2 class="font-heading font-bold text-xl text-ink mt-4">UMKM tidak ditemukan</h2>
+      <p class="text-muted mt-1">Coba kata kunci lain atau ganti kategori.</p>
+      <button id="reset" class="mt-4 inline-flex items-center gap-2 border-2 border-primary text-primary font-heading font-semibold px-4 py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors min-h-[44px]">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset filter
+      </button>
+    </div>
+  </div>
+</main>
+
+</Layout>
+
+<script define:vars={{ displayJson }}>
+  const UMKM = JSON.parse(displayJson);
+  const CAT_MAP = { 'kuliner': 'Kuliner', 'kriya': 'Kriya', 'jasa': 'Jasa', 'hasil-tani': 'Hasil Tani', 'semua': 'Semua' };
+  const TAG_COLOR = { 'Kuliner': 'bg-orange-100 text-orange-700', 'Kriya': 'bg-purple-100 text-purple-700', 'Jasa': 'bg-blue-100 text-blue-700', 'Hasil Tani': 'bg-green-100 text-green-700', 'default': 'bg-sand text-primary' };
+
+  let activeCat = 'semua', query = '';
+  const grid = document.getElementById('grid');
+  const countEl = document.getElementById('count');
+  const emptyEl = document.getElementById('empty');
+
+  function cardHTML(u) {
+    const tagColor = TAG_COLOR[u.kategori] ?? TAG_COLOR['default'];
+    const imgHTML = u.img
+      ? `<img src="${u.img}" alt="${u.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />`
+      : `<div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);"></div>`;
+    const contactHTML = u.wa_number
+      ? `<a href="https://wa.me/${u.wa_number}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center justify-center gap-2 w-full bg-cta hover:bg-ctaDark text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>`
+      : `<a href="/umkm/${u.slug}" class="mt-3 inline-flex items-center justify-center gap-2 w-full border-2 border-primary text-primary hover:bg-primary hover:text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]"><i data-lucide="phone" class="w-4 h-4"></i> Kontak</a>`;
+    const locHTML = u.lokasi ? `<p class="text-xs text-muted mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> ${u.lokasi}</p>` : '';
+    const descHTML = u.desc ? `<p class="text-sm text-muted mt-1 flex-1 line-clamp-2">${u.desc}</p>` : '';
+    return `<article class="umkm-card group bg-white border border-line rounded-xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all flex flex-col" data-name="${u.nama.toLowerCase()}" data-cat="${(u.kategori ?? '').toLowerCase()}">
+      <a href="/umkm/${u.slug}" class="block aspect-[16/10] overflow-hidden">${imgHTML}</a>
+      <div class="p-4 flex flex-col flex-1">
+        <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full w-max ${tagColor}">${u.kategori}</span>
+        <h3 class="font-heading font-semibold text-ink mt-2"><a href="/umkm/${u.slug}" class="hover:text-primary">${u.nama}</a></h3>
+        ${locHTML}${descHTML}
+        <div class="mt-2">
+          <a href="/umkm/${u.slug}" class="text-sm font-heading font-semibold text-accent hover:underline">Lihat Detail</a>
+        </div>
+        ${contactHTML}
+      </div>
+    </article>`;
+  }
+
+  function render() {
+    const list = UMKM.filter(u => {
+      const cat = (u.kategori ?? '').toLowerCase();
+      const matchCat = activeCat === 'semua' || cat === activeCat || (activeCat === 'hasil-tani' && cat.includes('tani'));
+      const matchQ = !query || u.nama.toLowerCase().includes(query);
+      return matchCat && matchQ;
+    });
+    grid.innerHTML = list.map(cardHTML).join('');
+    countEl.textContent = `Menampilkan ${list.length} UMKM`;
+    emptyEl.classList.toggle('hidden', list.length > 0);
+    grid.classList.toggle('hidden', list.length === 0);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  document.getElementById('umkm-search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
+
+  document.querySelectorAll('.chip-filter').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.chip-filter').forEach(b => {
+      b.classList.remove('is-active','bg-primary','text-white','border-primary');
+      b.classList.add('border-line','text-ink');
+    });
+    btn.classList.add('is-active','bg-primary','text-white','border-primary');
+    btn.classList.remove('border-line','text-ink');
+    activeCat = btn.dataset.cat;
+    render();
+  }));
+
+  document.getElementById('reset').addEventListener('click', () => {
+    activeCat = 'semua'; query = '';
+    document.getElementById('umkm-search').value = '';
+    document.querySelectorAll('.chip-filter').forEach(b => {
+      b.classList.remove('bg-primary','text-white','border-primary'); b.classList.add('border-line','text-ink');
+    });
+    const allBtn = document.querySelector('[data-cat="semua"]');
+    if (allBtn) { allBtn.classList.add('bg-primary','text-white','border-primary'); allBtn.classList.remove('border-line','text-ink'); }
+    render();
+  });
+
+  render();
+</script>

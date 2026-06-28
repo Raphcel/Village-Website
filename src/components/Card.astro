@@ -1,0 +1,31 @@
+---
+interface Props {
+  href: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  class?: string;
+}
+
+const { href, imageSrc, imageAlt = '', class: className } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'block bg-surface border border-border rounded-[12px] overflow-hidden cursor-pointer',
+    'transition-[box-shadow,border-color] duration-200',
+    'hover:shadow-lg hover:border-accent',
+    'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-2',
+    className,
+  ]}
+>
+  {imageSrc && (
+    <img
+      src={imageSrc}
+      alt={imageAlt}
+      loading="lazy"
+      class="w-full aspect-[16/10] object-cover"
+    />
+  )}
+  <slot />
+</a>

@@ -1,0 +1,116 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllBerita, formatTanggal } from '../../../lib/db/berita';
+
+import { getEnv } from '@lib/env';
+const env = getEnv();
+const beritaList = env ? await getAllBerita(env.DB) : [];
+const deleted = Astro.url.searchParams.get('deleted');
+const statusFilter = Astro.url.searchParams.get('status') ?? 'all';
+const search = Astro.url.searchParams.get('q') ?? '';
+
+const filtered = beritaList.filter(b => {
+  const matchSearch = !search || b.judul.toLowerCase().includes(search.toLowerCase());
+  const matchStatus = statusFilter === 'all' || b.status === statusFilter;
+  return matchSearch && matchStatus;
+});
+---
+
+<AdminLayout title="Kelola Berita" breadcrumb="Berita">
+
+  {deleted && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Berita berhasil dihapus.
+    </div>
+  )}
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Kelola Berita</h2>
+    <a href="/admin/berita/new"
+      class="px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+      style="background:var(--color-cta); min-height:44px; display:flex; align-items:center;">
+      + Tulis Baru
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <form method="GET" class="flex flex-wrap gap-3 mb-6">
+    <input type="text" name="q" value={search} placeholder="Cari judul..."
+      class="rounded-lg border px-4 py-2 text-sm focus:outline-none flex-1 min-w-48"
+      style="border-color:var(--color-border); min-height:44px;" />
+    <select name="status"
+      class="rounded-lg border px-4 py-2 text-sm focus:outline-none"
+      style="border-color:var(--color-border); min-height:44px;">
+      <option value="all" selected={statusFilter === 'all'}>Semua</option>
+      <option value="published" selected={statusFilter === 'published'}>Terbit</option>
+      <option value="draft" selected={statusFilter === 'draft'}>Draf</option>
+    </select>
+    <button type="submit"
+      class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand cursor-pointer"
+      style="border-color:var(--color-border); min-height:44px;">
+      Cari
+    </button>
+  </form>
+
+  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+    {filtered.length === 0 ? (
+      <div class="p-8 text-center text-text-muted">
+        {beritaList.length === 0 ? 'Belum ada berita.' : 'Tidak ada berita yang sesuai.'}
+      </div>
+    ) : (
+      <table class="w-full text-sm">
+        <thead style="background:#F8FAFC;">
+          <tr class="border-b border-border">
+            <th class="text-left px-4 py-3 font-heading font-semibold">Judul</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Status</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Tanggal</th>
+            <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((b) => (
+            <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
+              <td class="px-4 py-3 font-medium max-w-xs truncate">{b.judul}</td>
+              <td class="px-4 py-3 hidden md:table-cell">
+                <span class:list={['inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium',
+                  b.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600']}>
+                  <span class:list={['w-1.5 h-1.5 rounded-full', b.status === 'published' ? 'bg-green-500' : 'bg-gray-400']} aria-hidden="true"></span>
+                  {b.status === 'published' ? 'Terbit' : 'Draf'}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-text-muted hidden md:table-cell">
+                {b.published_at ? formatTanggal(b.published_at) : formatTanggal(b.created_at)}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-2">
+                  <a href={`/admin/berita/${b.id}`}
+                    class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border transition-colors hover:bg-primary hover:text-white"
+                    style="border-color:var(--color-primary); color:var(--color-primary);">
+                    Sunting
+                  </a>
+                  {b.status === 'published' && (
+                    <a href={`/berita/${b.slug}`} target="_blank"
+                      class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border hover:bg-sand"
+                      style="border-color:var(--color-border); color:var(--color-text-muted);">
+                      Lihat
+                    </a>
+                  )}
+                  <form method="POST" action="/api/admin/berita/delete"
+                    onsubmit="return confirm('Hapus berita ini? Tindakan tidak dapat dibatalkan.')">
+                    <input type="hidden" name="id" value={String(b.id)} />
+                    <button type="submit"
+                      class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600"
+                      style="border-color:#FECACA; color:#DC2626;">
+                      Hapus
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+</AdminLayout>

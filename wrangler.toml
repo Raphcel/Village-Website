@@ -1,0 +1,27 @@
+name = "web-desa-loji"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ─── Cloudflare D1 (konten SQLite) ───────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "web-desa-loji-db"
+database_id = "placeholder-replace-with-real-id-after-account-setup"
+
+# ─── Cloudflare R2 (media binary) ────────────────────────────────────────────
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "web-desa-loji-media"
+
+# ─── Cloudflare KV (sesi TTL) ────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "SESSION_KV"
+id = "placeholder-replace-with-real-id-after-account-setup"
+
+# ─── Cron triggers ───────────────────────────────────────────────────────────
+[triggers]
+crons = ["0 0 * * 0"]
+
+# ─── Local development ────────────────────────────────────────────────────────
+[dev]
+port = 4321

@@ -1,0 +1,24 @@
+.claude/
+_bmad/
+_bmad-output/
+design-system/
+product-brief.md/
+/
+# Node
+node_modules/
+
+# Astro build output and type cache
+dist/
+.astro/
+
+# Wrangler local state (D1/R2/KV emulation) — never commit
+.wrangler/
+
+# Local dev secrets — never commit (use .dev.vars.example as template)
+.dev.vars
+
+# OS
+.DS_Store
+Thumbs.db
+
+

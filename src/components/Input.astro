@@ -1,0 +1,67 @@
+---
+interface Props {
+  id: string;
+  label: string;
+  type?: string;
+  name?: string;
+  placeholder?: string;
+  required?: boolean;
+  helperText?: string;
+  errorMessage?: string;
+  value?: string;
+  class?: string;
+}
+
+const {
+  id,
+  label,
+  type = 'text',
+  name,
+  placeholder,
+  required = false,
+  helperText,
+  errorMessage,
+  value,
+  class: className,
+} = Astro.props;
+
+const hasError = Boolean(errorMessage);
+---
+
+<div class:list={['flex flex-col gap-1', className]}>
+  <label for={id} class="text-sm font-semibold text-text font-body">
+    {label}
+    {required && (
+      <span class="text-red-600 ml-1" aria-hidden="true">*</span>
+      <span class="sr-only"> (wajib)</span>
+    )}
+  </label>
+
+  {helperText && (
+    <p class="text-sm text-text-muted">{helperText}</p>
+  )}
+
+  <input
+    id={id}
+    name={name ?? id}
+    type={type}
+    placeholder={placeholder}
+    required={required}
+    value={value}
+    class:list={[
+      'block w-full px-4 py-3 min-h-[44px] text-base font-body',
+      'border rounded-[8px] bg-surface text-text',
+      'transition-[border-color,box-shadow] duration-200',
+      'focus-visible:outline-none focus-visible:border-accent focus-visible:shadow-[0_0_0_3px_rgba(14,154,167,0.25)]',
+      hasError ? 'border-red-600' : 'border-border',
+    ]}
+    aria-describedby={hasError ? `${id}-error` : helperText ? `${id}-helper` : undefined}
+    aria-invalid={hasError ? 'true' : undefined}
+  />
+
+  {hasError && (
+    <p id={`${id}-error`} role="alert" class="text-sm text-red-600">
+      {errorMessage}
+    </p>
+  )}
+</div>

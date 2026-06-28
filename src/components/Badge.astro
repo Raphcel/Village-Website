@@ -1,0 +1,30 @@
+---
+interface Props {
+  type: 'wisata' | 'umkm' | 'potensi';
+  class?: string;
+}
+
+const { type, class: className } = Astro.props;
+
+const labels: Record<string, string> = {
+  wisata: 'Wisata',
+  umkm: 'UMKM',
+  potensi: 'Potensi',
+};
+
+const colorClasses: Record<string, string> = {
+  wisata: 'bg-[#E0F5F7] text-[#0A6B74]',
+  umkm: 'bg-[#E3F2E8] text-[#126B33]',
+  potensi: 'bg-[#E3ECF3] text-[#0E4A6E]',
+};
+---
+
+<span
+  class:list={[
+    'inline-block text-[13px] font-semibold px-[10px] py-[4px] rounded-full',
+    colorClasses[type],
+    className,
+  ]}
+>
+  {labels[type]}
+</span>

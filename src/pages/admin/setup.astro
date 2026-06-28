@@ -1,0 +1,72 @@
+---
+import '../../styles/global.css';
+
+// Setup page: only accessible when no admin users exist
+import { getEnv } from '@lib/env';
+const env = getEnv();
+let adminExists = false;
+if (env) {
+  const row = await env.DB.prepare('SELECT id FROM admin_user LIMIT 1').first();
+  if (row) adminExists = true;
+}
+
+if (adminExists) return Astro.redirect('/admin/login');
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Buat Akun Admin — Desa Loji</title>
+  <meta name="robots" content="noindex,nofollow" />
+</head>
+<body class="font-body min-h-screen flex items-center justify-center" style="background:#F1F5F9;">
+
+  <div class="w-full max-w-sm mx-4">
+    <div class="text-center mb-8">
+      <div class="inline-flex w-14 h-14 rounded-full items-center justify-center mb-3 font-heading font-bold text-white text-lg" style="background:#0A3650;" aria-hidden="true">DL</div>
+      <h1 class="font-heading font-bold text-xl" style="color:#0A3650;">Buat Akun Admin</h1>
+      <p class="text-text-muted text-sm mt-1">Hanya bisa diakses saat belum ada akun admin</p>
+    </div>
+
+    {error && (
+      <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+        {error}
+      </div>
+    )}
+
+    <form method="POST" action="/api/admin/setup" class="bg-white rounded-xl p-6" style="box-shadow:var(--shadow-md);">
+      <div class="space-y-4">
+        <div>
+          <label for="username" class="block font-heading font-medium text-sm mb-1.5">
+            Nama Pengguna <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
+          </label>
+          <input type="text" id="username" name="username" required
+            class="w-full rounded-lg border px-4 py-3 text-base"
+            style="border-color:var(--color-border); min-height:44px;" />
+        </div>
+        <div>
+          <label for="password" class="block font-heading font-medium text-sm mb-1.5">
+            Kata Sandi <span>*</span> <span class="font-normal text-text-muted">(wajib, min. 8 karakter)</span>
+          </label>
+          <input type="password" id="password" name="password" required minlength="8"
+            class="w-full rounded-lg border px-4 py-3 text-base"
+            style="border-color:var(--color-border); min-height:44px;" />
+        </div>
+        <button type="submit"
+          class="w-full rounded-lg font-heading font-semibold text-white py-3 cursor-pointer"
+          style="background:var(--color-cta); min-height:44px;">
+          Buat Akun & Masuk
+        </button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

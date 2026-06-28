@@ -1,0 +1,63 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllSections } from '../../../lib/db/page-section';
+
+import { getEnv } from '@lib/env';
+const env = getEnv();
+const sections = env ? await getAllSections(env.DB) : [];
+
+const sectionLabels: Record<string, string> = {
+  'beranda-hero':                'Beranda — Hero',
+  'beranda-sekilas':             'Beranda — Sekilas Desa',
+  'profil-umum':                 'Profil — Umum',
+  'profil-geografis':            'Profil — Geografis',
+  'profil-sejarah':              'Profil — Sejarah',
+  'potensi':                     'Potensi Desa',
+  'pemerintahan-visi-misi':      'Pemerintahan — Visi & Misi',
+  'pemerintahan-ruang-lingkup':  'Pemerintahan — Ruang Lingkup',
+  'pemerintahan-tugas-fungsi':   'Pemerintahan — Tugas & Fungsi',
+};
+---
+
+<AdminLayout title="Konten Halaman" breadcrumb="Konten Halaman">
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Konten Halaman</h2>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+    {sections.length === 0 ? (
+      <div class="p-8 text-center text-text-muted">
+        <p>Belum ada konten. Jalankan migrasi database terlebih dahulu.</p>
+      </div>
+    ) : (
+      <table class="w-full text-sm">
+        <thead style="background:#F8FAFC;">
+          <tr class="border-b border-border">
+            <th class="text-left px-4 py-3 font-heading font-semibold">Bagian</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Terakhir Diubah</th>
+            <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sections.map((s) => (
+            <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
+              <td class="px-4 py-3 font-medium">{sectionLabels[s.slug] ?? s.slug}</td>
+              <td class="px-4 py-3 text-text-muted hidden md:table-cell">
+                {new Date(s.updated_at).toLocaleDateString('id-ID')}
+              </td>
+              <td class="px-4 py-3 text-center">
+                <a href={`/admin/konten/${s.slug}`}
+                  class="inline-block px-3 py-1.5 rounded-md font-heading font-medium text-xs border transition-colors hover:bg-primary hover:text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+                  style="border-color:var(--color-primary); color:var(--color-primary);">
+                  Sunting
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+</AdminLayout>

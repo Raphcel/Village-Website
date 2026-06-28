@@ -1,0 +1,277 @@
+---
+import Layout from '../components/Layout.astro';
+import { getSection } from '../lib/db/page-section';
+import { getPerangkatDesa } from '../lib/db/perangkat-desa';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const [visiMisi, ruangLingkup, tugasFungsi, perangkat] = await Promise.all([
+  env ? getSection('pemerintahan-visi-misi', env.DB) : null,
+  env ? getSection('pemerintahan-ruang-lingkup', env.DB) : null,
+  env ? getSection('pemerintahan-tugas-fungsi', env.DB) : null,
+  env ? getPerangkatDesa(env.DB) : [],
+]);
+
+const tiers = {
+  kepala: perangkat.find(p => p.jabatan?.toLowerCase().includes('kepala desa')),
+  sekdes: perangkat.find(p => p.jabatan?.toLowerCase().includes('sekretaris')),
+  others: perangkat.filter(p => !p.jabatan?.toLowerCase().includes('kepala desa') && !p.jabatan?.toLowerCase().includes('sekretaris')),
+};
+
+const demoStaff = [
+  { jabatan: 'Kepala Desa', nama: '[ Nama Kepala Desa ]', tier: 'kepala' },
+  { jabatan: 'Sekretaris Desa', nama: '[ Nama ]', tier: 'sekdes' },
+  { jabatan: 'Kaur Keuangan', nama: '[ Nama ]' },
+  { jabatan: 'Kaur Umum & TU', nama: '[ Nama ]' },
+  { jabatan: 'Kasi Pemerintahan', nama: '[ Nama ]' },
+  { jabatan: 'Kasi Kesejahteraan', nama: '[ Nama ]' },
+  { jabatan: 'Kasi Pelayanan', nama: '[ Nama ]' },
+  { jabatan: 'Kepala Dusun', nama: '[ Nama ]' },
+];
+---
+
+<Layout
+  title="Pemerintahan Desa — Desa Loji"
+  description="Pemerintahan Desa Loji: perangkat desa, struktur organisasi, visi & misi, ruang lingkup, tugas & fungsi."
+>
+
+<!-- Hero -->
+<section class="relative">
+  <div class="h-48 sm:h-60 overflow-hidden">
+    <img
+      src="/images/kantor_desa.png"
+      alt="Kantor Desa Loji"
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <div class="absolute inset-0" style="background: rgba(10,54,80,0.6);"></div>
+  <div class="absolute inset-0 flex items-end">
+    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
+      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
+        <a href="/" class="hover:text-white">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/profil" class="hover:text-white">Profil</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="font-medium">Pemerintahan</span>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Pemerintahan Desa Loji</h1>
+      <p class="text-white/85 mt-1 max-w-xl">Perangkat, struktur, dan visi-misi penyelenggara pemerintahan desa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Sticky subnav -->
+<div class="subnav sticky top-16 z-30 bg-white border-b border-line">
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-2 flex gap-2 overflow-x-auto">
+    {[
+      ['#perangkat', 'Perangkat Desa'],
+      ['#struktur', 'Struktur Organisasi'],
+      ['#visi-misi', 'Visi & Misi'],
+      ['#ruang-lingkup', 'Ruang Lingkup'],
+      ['#tugas-fungsi', 'Tugas & Fungsi'],
+    ].map(([href, label]) => (
+      <a
+        href={href}
+        class="subnav-link whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors"
+      >
+        {label}
+      </a>
+    ))}
+  </div>
+</div>
+
+<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10 space-y-14">
+
+  <!-- Perangkat Desa -->
+  <section id="perangkat" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Perangkat Desa</h2>
+    <p class="text-muted mt-2 max-w-2xl">Jajaran perangkat Pemerintah Desa Loji, dari pimpinan hingga pelaksana.</p>
+
+    {perangkat.length > 0 ? (
+      <div class="mt-8 space-y-6">
+        {tiers.kepala && (
+          <div class="flex flex-col items-center">
+            <div class="bg-white border border-line rounded-2xl shadow-[0_4px_10px_rgba(15,36,51,.08)] p-6 sm:p-8 text-center w-full max-w-sm">
+              <div class="w-36 h-36 rounded-full mx-auto ring-4 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
+                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-4xl text-white">{tiers.kepala.nama[0]}</div>
+              </div>
+              <span class="inline-block mt-4 text-xs font-heading font-bold px-3 py-1 rounded-full bg-primary text-white uppercase tracking-wide">Kepala Desa</span>
+              <h3 class="font-heading font-bold text-2xl text-ink mt-2">{tiers.kepala.nama}</h3>
+              <p class="text-muted text-sm mt-1">Pemimpin penyelenggaraan pemerintahan desa</p>
+            </div>
+            <span class="w-px h-8 bg-line" aria-hidden="true"></span>
+          </div>
+        )}
+        {tiers.sekdes && (
+          <div class="flex flex-col items-center">
+            <div class="bg-white border border-line rounded-2xl shadow-[0_4px_10px_rgba(15,36,51,.08)] p-6 text-center w-full max-w-xs">
+              <div class="w-28 h-28 rounded-full mx-auto ring-4 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0A3650, #0E9AA7);">
+                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-3xl text-white">{tiers.sekdes.nama[0]}</div>
+              </div>
+              <span class="inline-block mt-3 text-xs font-heading font-bold px-3 py-1 rounded-full bg-accent text-white uppercase tracking-wide">Sekretaris Desa</span>
+              <h3 class="font-heading font-bold text-lg text-ink mt-2">{tiers.sekdes.nama}</h3>
+            </div>
+            <span class="w-px h-8 bg-line" aria-hidden="true"></span>
+          </div>
+        )}
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {tiers.others.map(p => (
+            <div class="bg-white border border-line rounded-xl p-5 text-center">
+              <div class="w-20 h-20 rounded-full mx-auto ring-2 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
+                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-2xl text-white">{p.nama[0]}</div>
+              </div>
+              <span class="inline-block mt-3 text-[11px] font-heading font-semibold px-2.5 py-0.5 rounded-full bg-sand text-primary uppercase">{p.jabatan}</span>
+              <h3 class="font-heading font-semibold text-ink mt-1.5">{p.nama}</h3>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class="mt-8 space-y-6">
+        <!-- Kepala Desa -->
+        <div class="flex flex-col items-center">
+          <div class="bg-white border border-line rounded-2xl shadow-[0_4px_10px_rgba(15,36,51,.08)] p-6 sm:p-8 text-center w-full max-w-sm">
+            <div class="w-36 h-36 rounded-full mx-auto ring-4 ring-sand flex items-center justify-center" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
+              <i data-lucide="user" class="w-16 h-16 text-white/50"></i>
+            </div>
+            <span class="inline-block mt-4 text-xs font-heading font-bold px-3 py-1 rounded-full bg-primary text-white uppercase tracking-wide">Kepala Desa</span>
+            <h3 class="font-heading font-bold text-xl text-ink mt-2">[ Nama Kepala Desa ]</h3>
+            <p class="text-muted text-sm mt-1">Pemimpin penyelenggaraan pemerintahan desa</p>
+          </div>
+          <span class="w-px h-8 bg-line" aria-hidden="true"></span>
+        </div>
+        <!-- Sekdes -->
+        <div class="flex flex-col items-center">
+          <div class="bg-white border border-line rounded-2xl shadow-[0_4px_10px_rgba(15,36,51,.08)] p-6 text-center w-full max-w-xs">
+            <div class="w-28 h-28 rounded-full mx-auto ring-4 ring-sand flex items-center justify-center" style="background: linear-gradient(135deg, #0A3650, #0E9AA7);">
+              <i data-lucide="user" class="w-12 h-12 text-white/50"></i>
+            </div>
+            <span class="inline-block mt-3 text-xs font-heading font-bold px-3 py-1 rounded-full bg-accent text-white uppercase tracking-wide">Sekretaris Desa</span>
+            <h3 class="font-heading font-bold text-lg text-ink mt-2">[ Nama ]</h3>
+          </div>
+          <span class="w-px h-8 bg-line" aria-hidden="true"></span>
+        </div>
+        <!-- Tier 3 -->
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {['Kaur Keuangan','Kaur Umum & TU','Kasi Pemerintahan','Kasi Kesejahteraan','Kasi Pelayanan','Kepala Dusun'].map((jabatan, i) => (
+            <div class="bg-white border border-line rounded-xl p-5 text-center">
+              <div class="w-20 h-20 rounded-full mx-auto ring-2 ring-sand flex items-center justify-center" style={`background: linear-gradient(135deg, ${i % 2 === 0 ? '#0E4A6E, #0E9AA7' : '#0A3650, #0E4A6E'});`}>
+                <i data-lucide="user" class="w-8 h-8 text-white/50"></i>
+              </div>
+              <span class="inline-block mt-3 text-[11px] font-heading font-semibold px-2.5 py-0.5 rounded-full bg-sand text-primary uppercase">{jabatan}</span>
+              <h3 class="font-heading font-semibold text-ink mt-1.5">[ Nama ]</h3>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
+
+  <!-- Struktur Organisasi -->
+  <section id="struktur" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Struktur Organisasi</h2>
+    <p class="text-muted mt-2 max-w-2xl">Bagan struktur organisasi Pemerintah Desa Loji beserta jajaran perangkatnya.</p>
+    <div class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+      <img src="/images/struktur_organisasi.png" alt="Bagan Struktur Organisasi Desa Loji" class="w-full h-auto object-cover" />
+    </div>
+  </section>
+
+  <!-- Visi & Misi -->
+  <section id="visi-misi" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary mb-6">Visi & Misi</h2>
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="bg-primary text-white rounded-2xl p-7">
+        <span class="inline-flex items-center gap-2 text-white/80 font-heading font-semibold">
+          <i data-lucide="target" class="w-5 h-5"></i> Visi
+        </span>
+        <p class="text-xl font-heading font-semibold mt-3 leading-snug" set:html={visiMisi?.content_html ?? '"Mewujudkan Desa Loji yang maju, mandiri, dan sejahtera berbasis potensi bahari dan pariwisata yang berkelanjutan."'} />
+      </div>
+      <div class="bg-white border border-line rounded-2xl p-7">
+        <span class="inline-flex items-center gap-2 text-primary font-heading font-semibold">
+          <i data-lucide="list-checks" class="w-5 h-5"></i> Misi
+        </span>
+        <ul class="mt-3 space-y-2.5">
+          {[
+            'Meningkatkan pelayanan publik yang transparan dan akuntabel.',
+            'Mengembangkan potensi pariwisata dan UMKM lokal.',
+            'Menjaga kelestarian lingkungan pesisir dan sumber daya alam.',
+            'Memperkuat partisipasi dan gotong royong masyarakat.',
+          ].map((item, i) => (
+            <li class="flex gap-3">
+              <span class="w-6 h-6 rounded-full bg-sand text-primary grid place-items-center text-sm font-heading font-bold shrink-0">{i + 1}</span>
+              <span class="text-muted">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ruang Lingkup -->
+  <section id="ruang-lingkup" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Ruang Lingkup</h2>
+    <p class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Loji, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
+    <div class="grid sm:grid-cols-3 gap-4 mt-4">
+      {[
+        { icon: 'layers', label: 'Dusun', value: '5' },
+        { icon: 'grid-3x3', label: 'RW', value: '—' },
+        { icon: 'grid-2x2', label: 'RT', value: '—' },
+      ].map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+          <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
+          <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
+          <p class="font-heading font-bold text-xl text-primary mt-0.5">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Tugas & Fungsi -->
+  <section id="tugas-fungsi" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Tugas & Fungsi</h2>
+    <p class="text-muted mt-2 max-w-2xl">Peran masing-masing perangkat dalam penyelenggaraan pemerintahan desa.</p>
+    <div class="grid sm:grid-cols-2 gap-4 mt-4">
+      {[
+        { icon: 'user-round', title: 'Kepala Desa', desc: 'Memimpin penyelenggaraan pemerintahan, pembangunan, dan pemberdayaan masyarakat desa.' },
+        { icon: 'clipboard-list', title: 'Sekretaris Desa', desc: 'Membantu kepala desa di bidang administrasi dan tata usaha pemerintahan.' },
+        { icon: 'wallet', title: 'Kaur Keuangan', desc: 'Mengelola keuangan dan penatausahaan anggaran desa.' },
+        { icon: 'landmark', title: 'Kasi Pemerintahan', desc: 'Melaksanakan urusan pemerintahan, kependudukan, dan pertanahan.' },
+        { icon: 'heart-handshake', title: 'Kasi Kesejahteraan', desc: 'Melaksanakan pemberdayaan masyarakat dan kesejahteraan sosial.' },
+        { icon: 'clipboard-check', title: 'Kasi Pelayanan', desc: 'Menyelenggarakan pelayanan kepada masyarakat desa.' },
+      ].map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+          <h3 class="font-heading font-semibold text-ink flex items-center gap-2">
+            <i data-lucide={item.icon} class="w-5 h-5 text-primary"></i> {item.title}
+          </h3>
+          <p class="text-sm text-muted mt-1.5">{item.desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+</main>
+
+</Layout>
+
+<script is:inline>
+  // Subnav active state on scroll
+  const links = [...document.querySelectorAll('.subnav-link')];
+  const sections = links.map(l => {
+    const id = l.getAttribute('href').slice(1);
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('bg-primary','text-white','border-primary'));
+        const a = links.find(l => l.getAttribute('href') === '#' + e.target.id);
+        if (a) { a.classList.add('bg-primary','text-white','border-primary'); a.classList.remove('border-line','text-ink'); }
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
+</script>
