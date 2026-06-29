@@ -1,79 +1,77 @@
-# Website Desa Loji
+# Desa Loji Website
 
-Website resmi Desa Loji — dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Loji, Kabupaten Sukabumi. Situs ini menampilkan profil desa, potensi (pertanian, perikanan, pariwisata), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin agar perangkat desa dapat mengelola konten sendiri tanpa bantuan teknis.
+The official website of Desa Loji, Simpenan District, Sukabumi Regency — built as part of the **KKN-T Inovasi IPB University 2026** program. The site presents the village profile, its potential (agriculture, fisheries, tourism), a directory of local businesses (UMKM), an interactive map, and village news. It also includes an admin panel so village staff can manage all content themselves without technical help.
 
-## Tumpukan Teknologi (Tech Stack)
+## Tech Stack
 
-| Lapisan | Teknologi |
-|---------|-----------|
-| Framework | [Astro 7](https://astro.build) (mode `server` / SSR) |
+| Layer | Technology |
+|-------|-----------|
+| Framework | [Astro 7](https://astro.build) (`server` / SSR mode) |
 | Hosting & Runtime | [Cloudflare Workers](https://workers.cloudflare.com) (via `@astrojs/cloudflare`) |
 | Database | [Cloudflare D1](https://developers.cloudflare.com/d1/) (SQLite) |
-| Penyimpanan media | [Cloudflare R2](https://developers.cloudflare.com/r2/) (objek/gambar) |
-| Sesi login | [Cloudflare KV](https://developers.cloudflare.com/kv/) |
+| Media storage | [Cloudflare R2](https://developers.cloudflare.com/r2/) (objects/images) |
+| Login sessions | [Cloudflare KV](https://developers.cloudflare.com/kv/) |
 | Styling | [Tailwind CSS 4](https://tailwindcss.com) |
-| Peta | [Leaflet](https://leafletjs.com) |
-| Komponen interaktif | React 19 |
+| Maps | [Leaflet](https://leafletjs.com) |
+| Interactive components | React 19 |
 
-Pilihan ini menjaga biaya operasional tetap rendah (target ~Rp300 ribu/tahun) dengan memanfaatkan tier gratis Cloudflare.
-
-## Struktur Proyek
+## Project Structure
 
 ```
 src/
-├── components/      Komponen UI (Layout, Nav, Footer, Button, Card, dll.)
+├── components/      UI components (Layout, Nav, Footer, Button, Card, etc.)
 ├── lib/
-│   ├── auth/        Hashing kata sandi (PBKDF2) & sesi KV
-│   ├── db/          Akses data D1 per entitas (wisata, umkm, berita, dll.)
-│   ├── cache/       Purge cache halaman publik
-│   ├── media/       Pipeline unggah gambar ke R2
-│   └── env.ts       Akses binding Cloudflare
+│   ├── auth/        Password hashing (PBKDF2) & KV sessions
+│   ├── db/          D1 data access per entity (wisata, umkm, berita, etc.)
+│   ├── cache/       Public page cache purging
+│   ├── media/       Image upload pipeline to R2
+│   └── env.ts       Cloudflare binding access
 ├── pages/
-│   ├── (publik)     index, profil, potensi, wisata, umkm, peta, berita, kontak
-│   ├── admin/       Panel admin (dasbor + kelola konten)
-│   └── api/         Endpoint form admin, media, dan cron
-└── middleware.ts    Penjaga rute /admin
+│   ├── (public)     index, profil, potensi, wisata, umkm, peta, berita, kontak
+│   ├── admin/       Admin panel (dashboard + content management)
+│   └── api/         Admin form, media, and cron endpoints
+└── middleware.ts    /admin route guard
 
-migrations/          Skema D1 (0001) + data awal (0002)
-public/images/       Aset gambar statis
+migrations/          D1 schema (0001) + seed data (0002)
+public/images/       Static image assets
 ```
 
-## Model Data
+## Data Model
 
-Tabel utama di D1: `admin_user`, `page_section`, `wisata`, `umkm`, `berita`, `media`, `media_link` (relasi media polimorfik), `titik_peta` (pin peta), dan `perangkat_desa` (struktur organisasi). Lihat [`migrations/0001_schema.sql`](migrations/0001_schema.sql) untuk detail lengkap.
+Main D1 tables: `admin_user`, `page_section`, `wisata`, `umkm`, `berita`, `media`, `media_link` (polymorphic media relation), `titik_peta` (map pins), and `perangkat_desa` (village staff structure). See [`migrations/0001_schema.sql`](migrations/0001_schema.sql) for full details.
 
-## Menjalankan di Lokal
+## Running Locally
 
-**Prasyarat:** Node.js 20+ dan npm.
+**Prerequisites:** Node.js 20+ and npm.
 
 ```bash
-# 1. Pasang dependensi
+# 1. Install dependencies
 npm install
 
-# 2. Siapkan database D1 lokal (skema + data awal)
+# 2. Set up the local D1 database (schema + seed data)
 npm run db:setup
 
-# 3. Jalankan server pengembangan (build Astro lalu Wrangler)
+# 3. Start the dev server (Astro build, then Wrangler)
 npm run dev
 ```
 
-Situs akan tersedia di `http://localhost:4321`.
+The site will be available at `http://localhost:4321`.
 
-> **Catatan login lokal:** tanpa runtime Cloudflare, panel admin menerima `admin` / `admin` hanya untuk pengujian. Kredensial ini **tidak** berlaku di produksi.
+> **Local login note:** without the Cloudflare runtime, the admin panel accepts `admin` / `admin` for testing only. These credentials do **not** work in production.
 
-## Konfigurasi & Rahasia
+## Configuration & Secrets
 
-- Salin `.dev.vars.example` menjadi `.dev.vars` untuk variabel lingkungan lokal. File `.dev.vars` **tidak boleh** di-commit (sudah ada di `.gitignore`).
-- `wrangler.toml` memuat ID placeholder — ganti `database_id` (D1) dan `id` (KV) dengan nilai asli setelah membuat resource di akun Cloudflare.
-- Rahasia produksi diatur lewat `wrangler secret put NAMA_SECRET`.
+- Copy `.dev.vars.example` to `.dev.vars` for local environment variables. The `.dev.vars` file must **not** be committed (it is already in `.gitignore`).
+- `wrangler.toml` contains placeholder IDs — replace `database_id` (D1) and `id` (KV) with real values after creating the resources in your Cloudflare account.
+- Production secrets are set via `wrangler secret put SECRET_NAME`.
 
-## Deploy ke Produksi
+## Deploy
 
 ```bash
 npm run deploy   # astro build && wrangler deploy
 ```
 
-Sebelum deploy pertama, buat resource Cloudflare berikut dan tempel ID-nya ke `wrangler.toml`:
+Before the first deploy, create the following Cloudflare resources and paste their IDs into `wrangler.toml`:
 
 ```bash
 wrangler d1 create web-desa-loji-db
@@ -81,22 +79,14 @@ wrangler r2 bucket create web-desa-loji-media
 wrangler kv namespace create SESSION_KV
 ```
 
-Cron `0 0 * * 0` (tiap Minggu 00:00 UTC) menjalankan backup database otomatis ke R2.
+A cron job (`0 0 * * 0`, every Sunday at 00:00 UTC) runs an automatic database backup to R2.
 
-## Panel Admin
+## Admin Panel
 
-- Halaman setup pertama (`/admin/setup`) membuat akun admin awal — hanya bisa dipakai sekali (saat belum ada admin).
-- Login di `/admin/login`, lalu kelola konten dari `/admin/dasbor`.
-- Kata sandi disimpan sebagai hash PBKDF2 (SHA-256, 100.000 iterasi) dengan salt acak.
+- The first-run setup page (`/admin/setup`) creates the initial admin account — it works only once (while no admin user exists yet).
+- Log in at `/admin/login`, then manage content from `/admin/dasbor`.
+- Passwords are stored as PBKDF2 hashes (SHA-256, 100,000 iterations) with a random salt.
 
-## ⚠️ Status Keamanan
+## Contributors
 
-Proyek ini **belum siap dideploy ke publik**. Audit internal menemukan bahwa endpoint `/api/admin/*` belum memverifikasi sesi login, sehingga operasi tulis/hapus dan ekspor data dapat diakses tanpa autentikasi. Perbaikan otorisasi wajib dilakukan sebelum situs dipublikasikan. Lihat catatan tim untuk detail.
-
-## Status Pengembangan
-
-Dibangun mengikuti alur perencanaan terstruktur (brief → PRD → UX → arsitektur → epics & stories). Seluruh 30 story implementasi (Epic 1–7) telah dikerjakan dan menunggu tahap *code review*.
-
----
-
-*Dikembangkan oleh tim KKN-T Inovasi IPB University 2026 — Desa Loji, Kabupaten Sukabumi.*
+- **Rafif Muhammad Farras** — developer (KKN-T Inovasi IPB University 2026)

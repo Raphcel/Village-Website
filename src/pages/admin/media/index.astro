@@ -11,32 +11,77 @@ const mediaList = env ? await getAllMedia(env.DB) : [];
 
   <div class="flex items-center justify-between mb-6">
     <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Perpustakaan Media</h2>
+    <button type="button" id="upload-btn"
+      class="px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+      style="background:var(--color-cta); min-height:44px;">
+      + Upload
+    </button>
+    <input type="file" id="upload-file" accept="image/*" multiple class="hidden" />
   </div>
 
   <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
     <p class="text-text-muted text-sm mb-4">
-      Upload gambar dilakukan langsung dari form wisata, UMKM, dan berita. Total file tersimpan: <strong>{mediaList.length}</strong>
+      Unggah gambar di sini, atau langsung dari form berita, wisata, dan UMKM. Arahkan kursor ke gambar lalu klik
+      <strong>Salin URL</strong> untuk memakainya kembali. Total file tersimpan: <strong id="media-count">{mediaList.length}</strong>
     </p>
 
-    {mediaList.length === 0 ? (
-      <p class="text-center text-text-muted py-8">Belum ada media yang diunggah.</p>
-    ) : (
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {mediaList.map(m => (
-          <div class="aspect-square rounded-lg overflow-hidden border border-border bg-sand/30 relative group">
-            <img
-              src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`}
-              alt={m.alt}
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-1.5">
-              <p class="text-white text-xs leading-tight line-clamp-2">{m.alt}</p>
-            </div>
+    <div id="media-empty" class:list={['text-center text-text-muted py-8', mediaList.length > 0 && 'hidden']}>
+      Belum ada media yang diunggah.
+    </div>
+
+    <div id="media-grid" class:list={['grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3', mediaList.length === 0 && 'hidden']}>
+      {mediaList.map(m => (
+        <div class="aspect-square rounded-lg overflow-hidden border border-border bg-sand/30 relative group">
+          <img
+            src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`}
+            alt={m.alt}
+            class="w-full h-full object-cover"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-1.5">
+            <button type="button"
+              class="copy-url px-2 py-1 rounded-md bg-white/95 text-xs font-heading font-semibold cursor-pointer hover:bg-white"
+              data-url={`/api/media/${encodeURIComponent(m.r2_key_display)}`}>
+              Salin URL
+            </button>
+            <p class="text-white text-xs leading-tight line-clamp-2 text-center">{m.alt}</p>
           </div>
-        ))}
-      </div>
-    )}
+        </div>
+      ))}
+    </div>
   </div>
 
 </AdminLayout>
+
+<script>
+  import { uploadImage } from '../../../lib/media/client-upload';
+
+  const btn = document.getElementById('upload-btn') as HTMLButtonElement;
+  const file = document.getElementById('upload-file') as HTMLInputElement;
+
+  btn.addEventListener('click', () => file.click());
+  file.addEventListener('change', async () => {
+    const files = Array.from(file.files ?? []);
+    file.value = '';
+    if (!files.length) return;
+    btn.textContent = 'Mengunggah…';
+    btn.disabled = true;
+    try {
+      for (const f of files) await uploadImage(f);
+      location.reload(); // tampilkan hasil terbaru
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Gagal mengunggah gambar');
+      btn.textContent = '+ Upload';
+      btn.disabled = false;
+    }
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.copy-url').forEach((b) => {
+    b.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(new URL(b.dataset.url!, location.origin).href);
+      const prev = b.textContent;
+      b.textContent = 'Tersalin!';
+      setTimeout(() => { b.textContent = prev; }, 1500);
+    });
+  });
+</script>

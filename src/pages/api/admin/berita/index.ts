@@ -8,6 +8,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const fd = await request.formData();
   const judul = (fd.get('judul') as string)?.trim();
   const content_html = (fd.get('content_html') as string) ?? '';
+  const cover_media_id = Number(fd.get('cover_media_id')) || null;
   const action = fd.get('_action') as string;
   const status = action === 'publish' ? 'published' : 'draft';
 
@@ -16,7 +17,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   }
   if (!judul || !env) return redirect('/admin/berita/new?errors=Judul+belum+diisi.');
 
-  const { id, slug } = await createBerita({ judul, content_html, cover_media_id: null, status }, env.DB);
+  const { id, slug } = await createBerita({ judul, content_html, cover_media_id, status }, env.DB);
   await purgeCache(['/berita', `/berita/${slug}`, '/']);
   const qs = status === 'published' ? 'published=1' : 'saved=1';
   return redirect(`/admin/berita/${id}?${qs}`);
