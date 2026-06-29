@@ -1,0 +1,275 @@
+---
+// Penulis: Rafif Muhammad Farras (KKN-T Inovasi IPB University 2026 — Desa Loji)
+//
+// Editor berita bersama (dipakai halaman Tulis Baru & Edit). Mendukung format dasar,
+// gambar sampul, serta sisip foto di tengah teks lewat tombol, drag-drop, dan tempel (paste).
+interface Props {
+  action: string;
+  judul?: string;
+  contentHtml?: string;
+  coverMediaId?: number | null;
+  coverUrl?: string | null;
+}
+const { action, judul = '', contentHtml = '', coverMediaId = null, coverUrl = null } = Astro.props;
+---
+
+<div class="max-w-3xl">
+  <form id="berita-form" method="POST" action={action} class="space-y-5">
+
+    <!-- Judul -->
+    <div>
+      <label for="judul" class="font-heading font-medium text-sm block mb-1.5">
+        Judul Berita <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
+      </label>
+      <input type="text" id="judul" name="judul" required value={judul}
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border); min-height:44px;"
+        placeholder="Judul singkat dan jelas" />
+      <p id="judul-error" class="text-red-600 text-xs mt-1 hidden" role="alert">Judul belum diisi.</p>
+    </div>
+
+    <!-- Gambar sampul -->
+    <div>
+      <label class="font-heading font-medium text-sm block mb-1.5">
+        Gambar Sampul <span class="font-normal text-text-muted">(opsional — tampil di daftar berita & saat dibagikan)</span>
+      </label>
+      <input type="hidden" name="cover_media_id" id="cover_media_id" value={coverMediaId ?? ''} />
+      <div id="cover-box" class="flex items-center gap-4">
+        <div id="cover-preview-wrap" class:list={['relative w-40 aspect-[16/10] rounded-lg overflow-hidden border bg-sand/30', !coverUrl && 'hidden']}
+          style="border-color:var(--color-border);">
+          <img id="cover-preview" src={coverUrl ?? ''} alt="Pratinjau sampul" class="w-full h-full object-cover" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <button type="button" id="cover-pick"
+            class="px-3 py-2 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand"
+            style="border-color:var(--color-primary); color:var(--color-primary); min-height:44px;">
+            Pilih Gambar Sampul
+          </button>
+          <button type="button" id="cover-remove"
+            class:list={['text-xs text-red-600 hover:underline cursor-pointer text-left', !coverUrl && 'hidden']}>
+            Hapus sampul
+          </button>
+        </div>
+      </div>
+      <input type="file" id="cover-file" accept="image/*" class="hidden" />
+    </div>
+
+    <!-- Isi -->
+    <div>
+      <label class="block font-heading font-medium text-sm mb-1.5">
+        Isi Berita <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
+      </label>
+      <div class="border rounded-t-lg px-2 py-1.5 flex gap-1 flex-wrap items-center" style="border-color:var(--color-border); background:#F8FAFC;">
+        {[['bold','B','tebal'],['italic','I','miring'],['underline','U','garis bawah']].map(([cmd, lbl, title]) => (
+          <button type="button" data-cmd={cmd}
+            class="px-2 py-1 text-xs font-heading font-semibold rounded hover:bg-sand cursor-pointer border border-border"
+            title={title}>{lbl}</button>
+        ))}
+        <span class="w-px h-5 bg-border mx-1"></span>
+        {[['insertUnorderedList','Daftar •'],['insertOrderedList','Daftar 1.'],['formatBlock-h2','Sub-judul']].map(([cmd, lbl]) => (
+          <button type="button" data-cmd={cmd}
+            class="px-2 py-1 text-xs font-heading rounded hover:bg-sand cursor-pointer border border-border">{lbl}</button>
+        ))}
+        <span class="w-px h-5 bg-border mx-1"></span>
+        <button type="button" id="insert-photo"
+          class="px-2 py-1 text-xs font-heading font-medium rounded hover:bg-sand cursor-pointer border border-border inline-flex items-center gap-1"
+          title="Sisipkan foto ke dalam isi berita">
+          <i data-lucide="image-plus" class="w-3.5 h-3.5"></i> Sisipkan Foto
+        </button>
+        <span class="text-xs text-text-muted ml-auto hidden sm:inline">Tip: seret atau tempel (paste) foto langsung ke tulisan</span>
+      </div>
+      <div id="editor-isi" contenteditable="true"
+        class="w-full min-h-64 border border-t-0 rounded-b-lg px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border);"
+        aria-label="Isi berita" role="textbox" aria-multiline="true" set:html={contentHtml}></div>
+      <input type="hidden" id="content_html" name="content_html" value={contentHtml} />
+      <p id="isi-error" class="text-red-600 text-xs mt-1 hidden" role="alert">Isi berita belum diisi.</p>
+      <input type="file" id="inline-file" accept="image/*" class="hidden" />
+    </div>
+
+    <input type="hidden" name="_action" id="form-action" value="draft" />
+
+    <!-- Bilah aksi -->
+    <div class="sticky bottom-0 bg-white border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3 flex justify-end gap-3" style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
+      <a href="/admin/berita"
+        class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand"
+        style="border-color:var(--color-border); min-height:44px; display:flex; align-items:center;">Batal</a>
+      <button type="button" id="btn-draft"
+        class="px-4 py-2 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand"
+        style="border-color:var(--color-primary); color:var(--color-primary); min-height:44px;">Simpan Draf</button>
+      <button type="button" id="btn-publish"
+        class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
+        style="background:var(--color-cta); min-height:44px;">Terbitkan</button>
+    </div>
+  </form>
+</div>
+
+<style>
+  #editor-isi h2 { font-size:1.125rem; font-weight:700; margin:1rem 0 .25rem; }
+  #editor-isi ul { list-style:disc; padding-left:1.5rem; }
+  #editor-isi ol { list-style:decimal; padding-left:1.5rem; }
+  #editor-isi img { max-width:100%; height:auto; border-radius:8px; margin:.5rem 0; display:block; }
+  #editor-isi .uploading { display:inline-block; padding:.25rem .5rem; border-radius:6px; background:#E0F5F7; color:#0A6B74; font-size:.8rem; }
+  #editor-isi.drag-over { outline:2px dashed var(--color-accent); outline-offset:-4px; }
+</style>
+
+<script>
+  import { uploadImage } from '../lib/media/client-upload';
+
+  const form = document.getElementById('berita-form') as HTMLFormElement;
+  const editor = document.getElementById('editor-isi') as HTMLDivElement;
+  const hidden = document.getElementById('content_html') as HTMLInputElement;
+  const actionInput = document.getElementById('form-action') as HTMLInputElement;
+
+  // --- Format dasar ---
+  document.querySelectorAll('[data-cmd]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cmd = (btn as HTMLElement).dataset.cmd ?? '';
+      editor.focus();
+      if (cmd.startsWith('formatBlock-')) document.execCommand('formatBlock', false, cmd.split('-')[1]);
+      else document.execCommand(cmd, false);
+    });
+  });
+
+  // --- Sisip foto inline ---
+  function placeholderAtCaret(): HTMLElement {
+    const ph = document.createElement('span');
+    ph.className = 'uploading';
+    ph.contentEditable = 'false';
+    ph.textContent = '⏳ mengunggah foto…';
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
+      const range = sel.getRangeAt(0);
+      range.collapse(false);
+      range.insertNode(ph);
+      range.setStartAfter(ph);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      editor.appendChild(ph);
+    }
+    return ph;
+  }
+
+  async function insertFile(file: File, ph: HTMLElement) {
+    try {
+      const { url, alt } = await uploadImage(file);
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = alt;
+      const p = document.createElement('p');
+      ph.replaceWith(img);
+      img.after(p); // paragraf kosong agar bisa lanjut mengetik di bawah foto
+    } catch (err) {
+      ph.textContent = '⚠️ ' + (err instanceof Error ? err.message : 'Gagal mengunggah foto');
+      ph.classList.add('uploading');
+    }
+  }
+
+  function handleFiles(files: FileList | File[]) {
+    for (const f of Array.from(files)) {
+      if (!f.type.startsWith('image/')) continue;
+      const ph = placeholderAtCaret();
+      insertFile(f, ph);
+    }
+  }
+
+  // Tombol toolbar
+  const inlineFile = document.getElementById('inline-file') as HTMLInputElement;
+  document.getElementById('insert-photo')?.addEventListener('click', () => {
+    editor.focus();
+    inlineFile.click();
+  });
+  inlineFile.addEventListener('change', () => {
+    if (inlineFile.files?.length) handleFiles(inlineFile.files);
+    inlineFile.value = '';
+  });
+
+  // Drag & drop
+  editor.addEventListener('dragover', (e) => { e.preventDefault(); editor.classList.add('drag-over'); });
+  editor.addEventListener('dragleave', () => editor.classList.remove('drag-over'));
+  editor.addEventListener('drop', (e) => {
+    const files = e.dataTransfer?.files;
+    if (!files?.length) return;
+    e.preventDefault();
+    editor.classList.remove('drag-over');
+    // Tempatkan caret di titik jatuhnya foto bila browser mendukung.
+    const doc = document as any;
+    const range = doc.caretRangeFromPoint?.(e.clientX, e.clientY);
+    if (range) { const sel = window.getSelection(); sel?.removeAllRanges(); sel?.addRange(range); }
+    handleFiles(files);
+  });
+
+  // Tempel (paste) gambar dari clipboard
+  editor.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const imgs: File[] = [];
+    for (const it of Array.from(items)) {
+      if (it.type.startsWith('image/')) { const f = it.getAsFile(); if (f) imgs.push(f); }
+    }
+    if (imgs.length) { e.preventDefault(); handleFiles(imgs); }
+  });
+
+  // --- Gambar sampul ---
+  const coverFile = document.getElementById('cover-file') as HTMLInputElement;
+  const coverId = document.getElementById('cover_media_id') as HTMLInputElement;
+  const coverPreview = document.getElementById('cover-preview') as HTMLImageElement;
+  const coverWrap = document.getElementById('cover-preview-wrap') as HTMLDivElement;
+  const coverRemove = document.getElementById('cover-remove') as HTMLButtonElement;
+  const coverPick = document.getElementById('cover-pick') as HTMLButtonElement;
+
+  coverPick.addEventListener('click', () => coverFile.click());
+  coverFile.addEventListener('change', async () => {
+    const f = coverFile.files?.[0];
+    coverFile.value = '';
+    if (!f) return;
+    coverPick.textContent = 'Mengunggah…';
+    coverPick.disabled = true;
+    try {
+      const { id, url } = await uploadImage(f);
+      coverId.value = String(id);
+      coverPreview.src = url;
+      coverWrap.classList.remove('hidden');
+      coverRemove.classList.remove('hidden');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Gagal mengunggah sampul');
+    } finally {
+      coverPick.textContent = 'Pilih Gambar Sampul';
+      coverPick.disabled = false;
+    }
+  });
+  coverRemove.addEventListener('click', () => {
+    coverId.value = '';
+    coverPreview.src = '';
+    coverWrap.classList.add('hidden');
+    coverRemove.classList.add('hidden');
+  });
+
+  // --- Simpan / Terbitkan ---
+  function syncHtml() { hidden.value = editor.innerHTML; }
+
+  document.getElementById('btn-draft')?.addEventListener('click', () => {
+    syncHtml();
+    actionInput.value = 'draft';
+    form.submit();
+  });
+
+  document.getElementById('btn-publish')?.addEventListener('click', () => {
+    syncHtml();
+    const judul = (document.getElementById('judul') as HTMLInputElement).value.trim();
+    const hasContent = !!editor.innerText.trim() || !!editor.querySelector('img');
+    let valid = true;
+    if (!judul) { document.getElementById('judul-error')?.classList.remove('hidden'); valid = false; }
+    if (!hasContent) { document.getElementById('isi-error')?.classList.remove('hidden'); valid = false; }
+    if (!valid) {
+      (judul ? editor : (document.getElementById('judul') as HTMLInputElement)).focus();
+      return;
+    }
+    actionInput.value = 'publish';
+    form.submit();
+  });
+
+  // Render ikon Lucide milik tombol "Sisipkan Foto".
+  setTimeout(() => { const l = (window as any).lucide; if (l) l.createIcons(); }, 100);
+</script>
