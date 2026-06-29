@@ -20,7 +20,7 @@ import Layout from '../components/Layout.astro';
         { icon: 'mail', title: 'Email', content: 'desaloji@email.desa.id' },
         { icon: 'clock', title: 'Jam Layanan', content: 'Senin–Jumat, 08.00–15.00 WIB' },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 flex gap-4 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <div class="bg-white border border-line rounded-xl p-5 flex gap-4 shadow-[0_1px_3px_rgba(15,36,51,.07)]">
           <span class="w-11 h-11 rounded-full bg-sand grid place-items-center text-primary shrink-0">
             <i data-lucide={item.icon} class="w-5 h-5"></i>
           </span>
@@ -32,7 +32,7 @@ import Layout from '../components/Layout.astro';
       ))}
 
       <!-- Kanal resmi -->
-      <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+      <div class="bg-white border border-line rounded-xl p-5 shadow-[0_1px_3px_rgba(15,36,51,.07)]">
         <h2 class="font-heading font-semibold text-ink">Kanal Resmi</h2>
         <div class="flex flex-wrap gap-3 mt-3">
           <a href="#" aria-label="WhatsApp resmi desa"
@@ -53,7 +53,7 @@ import Layout from '../components/Layout.astro';
     </div>
 
     <!-- Map -->
-    <div class="relative rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] border border-line min-h-[20rem]">
+    <div class="relative rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,36,51,.07)] border border-line min-h-[20rem]">
       <div id="kontak-map" class="w-full h-full absolute inset-0"></div>
       <a href="/peta"
          class="absolute bottom-4 right-4 inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-4 py-2 rounded-lg shadow-[0_4px_10px_rgba(15,36,51,.12)] z-10 hover:bg-sand transition-colors">

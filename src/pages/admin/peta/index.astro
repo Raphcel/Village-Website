@@ -99,7 +99,7 @@ const titikJson = JSON.stringify(titikList);
           <tr class="border-b border-border last:border-0 hover:bg-sand/30">
             <td class="px-4 py-3 font-medium">{t.label ?? '—'}</td>
             <td class="px-4 py-3">
-              <span class:list={['inline-flex px-2 py-0.5 rounded-full text-xs font-medium',
+              <span class:list={['inline-flex px-2 py-0.5 rounded-sm text-xs font-medium',
                 t.jenis === 'wisata'  ? 'bg-cyan-100 text-cyan-700' :
                 t.jenis === 'umkm'   ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700']}>
                 {t.jenis}

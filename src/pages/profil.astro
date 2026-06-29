@@ -51,7 +51,7 @@ const [umum, geografis, sejarah] = await Promise.all([
     ].map(([href, label]) => (
       <a
         href={href}
-        class="whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors"
+        class="whitespace-nowrap px-3 py-1.5 rounded-sm text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors"
       >
         {label}
       </a>
@@ -69,7 +69,7 @@ const [umum, geografis, sejarah] = await Promise.all([
       { icon: 'home', label: 'Dusun', value: '5', sub: 'Wilayah' },
       { icon: 'store', label: 'UMKM', value: '12+', sub: 'Terdaftar' },
     ].map(s => (
-      <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+      <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_1px_3px_rgba(15,36,51,.07)]">
         <i data-lucide={s.icon} class="w-6 h-6 text-accent"></i>
         <p class="font-heading font-extrabold text-2xl text-primary mt-2">{s.value}</p>
         <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{s.sub}</p>
@@ -113,7 +113,7 @@ const [umum, geografis, sejarah] = await Promise.all([
         { icon: 'thermometer', label: 'Iklim', value: 'Tropis Basah' },
         { icon: 'waves', label: 'Garis Pantai', value: '±8 km' },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_1px_3px_rgba(15,36,51,.07)]">
           <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
           <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
           <p class="font-heading font-bold text-xl text-primary mt-0.5">{item.value}</p>
@@ -135,7 +135,7 @@ const [umum, geografis, sejarah] = await Promise.all([
   <section id="peta" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Peta Desa</h2>
     <p class="text-muted mt-2">Lokasi Desa Loji di Kecamatan Simpenan, Kabupaten Sukabumi.</p>
-    <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]" style="height: 380px;"></div>
+    <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_1px_3px_rgba(15,36,51,.07)]" style="height: 380px;"></div>
     <p class="text-sm text-muted mt-2 flex items-center gap-1.5">
       <i data-lucide="info" class="w-4 h-4"></i>
       Koordinat: -7.059, 106.578 ·
@@ -176,6 +176,6 @@ const [umum, geografis, sejarah] = await Promise.all([
 
 <style>
   .prose p { margin: .5rem 0; line-height: 1.75; }
-  .prose h3 { font-family: 'Lexend', sans-serif; font-weight: 700; color: #0E4A6E; margin: 1rem 0 .5rem; }
+  .prose h3 { font-family: 'Libre Franklin', sans-serif; font-weight: 700; color: #0E4A6E; margin: 1rem 0 .5rem; }
   [id] { scroll-margin-top: 120px; }
 </style>
