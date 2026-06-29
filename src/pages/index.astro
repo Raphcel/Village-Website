@@ -82,7 +82,7 @@ const finalBerita = beritaList.length > 0
 
   <!-- Content -->
   <div class="relative mx-auto max-w-[1152px] px-4 sm:px-6 flex flex-col justify-end" style="min-height: 78vh; padding-bottom: 6rem;">
-    <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-heading font-semibold px-3 py-1 rounded-full w-max mb-4">
+    <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-heading font-semibold px-3 py-1 rounded-sm w-max mb-4">
       <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
       Gerbang Geopark Ciletuh
     </span>
@@ -115,7 +115,7 @@ const finalBerita = beritaList.length > 0
       ].map(tile => (
         <a
           href={tile.href}
-          class="tile group relative block rounded-2xl overflow-hidden h-44 sm:h-56 shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] transition-shadow"
+          class="tile group relative block rounded-2xl overflow-hidden h-44 sm:h-56 shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] transition-shadow"
         >
           <img
             src={tile.img}
@@ -157,7 +157,7 @@ const finalBerita = beritaList.length > 0
     <div class="grid lg:grid-cols-2 gap-6">
       <!-- Big card (left) -->
       <a href={`/wisata/${finalWisata[0]?.slug ?? 'pantai-loji'}`}
-         class="group relative block rounded-2xl overflow-hidden h-80 lg:h-full min-h-[20rem] shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] transition-shadow">
+         class="group relative block rounded-2xl overflow-hidden h-80 lg:h-full min-h-[20rem] shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] transition-shadow">
         <img
           src={finalWisata[0]?.img || '/images/pantai_loji.png'}
           alt={finalWisata[0]?.nama ?? 'Pantai Loji'}
@@ -166,7 +166,7 @@ const finalBerita = beritaList.length > 0
         />
         <div class="absolute inset-0 bg-gradient-to-t from-[#0A3650]/90 to-transparent"></div>
         <div class="absolute bottom-0 p-6 text-white">
-          <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-accent/90">{finalWisata[0]?.tag ?? 'Pantai'}</span>
+          <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-sm bg-accent/90">{finalWisata[0]?.tag ?? 'Pantai'}</span>
           <h3 class="font-heading font-bold text-2xl mt-2">{finalWisata[0]?.nama ?? 'Pantai Loji'}</h3>
           <p class="text-white/85 mt-1 max-w-md">{finalWisata[0]?.desc ?? 'Pasir, ombak selatan, dan matahari terbenam — titik awal menjelajah Geopark Ciletuh.'}</p>
         </div>
@@ -174,7 +174,7 @@ const finalBerita = beritaList.length > 0
       <!-- Two small cards (right) -->
       <div class="grid sm:grid-cols-2 gap-6">
         <a href={`/wisata/${finalWisata[1]?.slug ?? 'kuil-dewi-kwan-im'}`}
-           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] hover:border-accent transition-all">
+           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] hover:border-accent transition-all">
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src={finalWisata[1]?.img || '/images/karang_sari.png'}
@@ -184,13 +184,13 @@ const finalBerita = beritaList.length > 0
             />
           </div>
           <div class="p-5">
-            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[1]?.tag ?? 'Budaya'}</span>
+            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-sm bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[1]?.tag ?? 'Budaya'}</span>
             <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[1]?.nama ?? 'Kuil Dewi Kwan Im'}</h3>
             <p class="text-sm text-muted mt-1">{finalWisata[1]?.desc ?? 'Vihara Nam Hai Kwan Se Im Pu Sa, ikon pesisir Loji.'}</p>
           </div>
         </a>
         <a href={`/wisata/${finalWisata[2]?.slug ?? 'geopark-ciletuh'}`}
-           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] hover:border-accent transition-all">
+           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] hover:border-accent transition-all">
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src={finalWisata[2]?.img || '/images/geopark_ciletuh.png'}
@@ -200,7 +200,7 @@ const finalBerita = beritaList.length > 0
             />
           </div>
           <div class="p-5">
-            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[2]?.tag ?? 'Alam'}</span>
+            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-sm bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[2]?.tag ?? 'Alam'}</span>
             <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[2]?.nama ?? 'Geopark Ciletuh'}</h3>
             <p class="text-sm text-muted mt-1">{finalWisata[2]?.desc ?? 'Pintu masuk kawasan Geopark Ciletuh-Palabuhanratu.'}</p>
           </div>
@@ -312,7 +312,7 @@ const finalBerita = beritaList.length > 0
     </div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {finalBerita.map(b => (
-        <a href={`/berita/${b.slug}`} class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all">
+        <a href={`/berita/${b.slug}`} class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] hover:border-accent transition-all">
           <div class="aspect-[16/9] overflow-hidden">
             {b.img ? (
               <img

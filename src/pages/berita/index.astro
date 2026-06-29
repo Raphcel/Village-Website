@@ -40,7 +40,7 @@ const restBerita = finalBerita.slice(1);
   {/* Featured article */}
   {featuredBerita && (
     <a href={`/berita/${featuredBerita.slug}`}
-       class="group grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all mt-6">
+       class="group grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] hover:border-accent transition-all mt-6">
       <div class="aspect-[16/10] md:aspect-auto overflow-hidden">
         {featuredBerita.img ? (
           <img
@@ -54,7 +54,7 @@ const restBerita = finalBerita.slice(1);
         )}
       </div>
       <div class="p-6 sm:p-8 flex flex-col justify-center">
-        <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74] w-max">Terbaru</span>
+        <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-sm bg-[#E0F5F7] text-[#0A6B74] w-max">Terbaru</span>
         <time class="text-sm text-muted mt-3">
           {featuredBerita.published_at ? formatTanggal(featuredBerita.published_at) : ''}
         </time>
@@ -74,7 +74,7 @@ const restBerita = finalBerita.slice(1);
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       {restBerita.map(b => (
         <a href={`/berita/${b.slug}`}
-           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all">
+           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,36,51,.07)] hover:shadow-[0_4px_12px_rgba(15,36,51,.12)] hover:border-accent transition-all">
           <div class="aspect-[16/9] overflow-hidden">
             {b.img ? (
               <img src={b.img} alt={b.judul} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />

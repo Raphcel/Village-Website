@@ -40,7 +40,7 @@ const finalCounts = titikList.length > 0
 
   <div class="grid lg:grid-cols-[280px_1fr] gap-5 mt-5">
     <!-- Filter panel -->
-    <aside class="bg-white border border-line rounded-2xl p-5 h-max shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+    <aside class="bg-white border border-line rounded-2xl p-5 h-max shadow-[0_1px_3px_rgba(15,36,51,.07)]">
       <h2 class="font-heading font-semibold text-ink">Tampilkan</h2>
       <div class="space-y-2 mt-3">
         {[
@@ -107,7 +107,7 @@ const finalCounts = titikList.length > 0
     });
     const href = p.jenis === 'potensi' ? '/potensi' : (LINK[p.jenis] ?? '/') + p.linked_slug;
     L.marker([p.lat, p.lng], { icon, title: p.label })
-      .bindPopup(`<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#0E4A6E;margin:0 0 4px">${p.label}</h3><p style="margin:0 0 6px;color:#475569;font-size:.85rem">${p.desc ?? ''}</p><a href="${href}" style="color:#0E9AA7;font-weight:600;font-size:.85rem">Lihat detail →</a>`)
+      .bindPopup(`<h3 style="font-family:'Libre Franklin',sans-serif;font-weight:700;color:#0E4A6E;margin:0 0 4px">${p.label}</h3><p style="margin:0 0 6px;color:#475569;font-size:.85rem">${p.desc ?? ''}</p><a href="${href}" style="color:#0E9AA7;font-weight:600;font-size:.85rem">Lihat detail →</a>`)
       .addTo(layers[p.jenis] ?? layers.wisata);
   });
 
