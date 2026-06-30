@@ -1,12 +1,14 @@
 name = "web-desa-loji"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+routes = [{ pattern = "loji.web.id/*", zone_name = "loji.web.id" }]
 
 # ─── Cloudflare D1 (konten SQLite) ───────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "web-desa-loji-db"
-database_id = "placeholder-replace-with-real-id-after-account-setup"
+database_id = "c578c1ca-4e96-4142-b0f0-4ceffe035ed9"
 
 # ─── Cloudflare R2 (media binary) ────────────────────────────────────────────
 [[r2_buckets]]
@@ -16,11 +18,14 @@ bucket_name = "web-desa-loji-media"
 # ─── Cloudflare KV (sesi TTL) ────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "placeholder-replace-with-real-id-after-account-setup"
+id = "12efcdd486e54c86a30f5db20351a1ab"
 
-# ─── Cron triggers ───────────────────────────────────────────────────────────
+# ─── Cron triggers (dinonaktifkan) ───────────────────────────────────────────
+# Backup mingguan otomatis dimatikan. Backup dilakukan manual lewat tombol
+# export di panel admin (lihat docs handover). Untuk mengaktifkan lagi:
+# isi crons = ["0 0 * * 0"] — butuh workers.dev subdomain akun terdaftar.
 [triggers]
-crons = ["0 0 * * 0"]
+crons = []
 
 # ─── Local development ────────────────────────────────────────────────────────
 [dev]
