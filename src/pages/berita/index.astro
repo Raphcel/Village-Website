@@ -1,10 +1,14 @@
 ---
 import Layout from '../../components/Layout.astro';
 import { getPublishedBerita, formatTanggal, excerpt } from '../../lib/db/berita';
+import { getCoversForType, mediaUrl } from '../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const beritaList = env ? await getPublishedBerita(env.DB) : [];
+const [beritaList, covers] = await Promise.all([
+  env ? getPublishedBerita(env.DB) : [],
+  env ? getCoversForType('berita', env.DB) : new Map(),
+]);
 
 const demoBerita = [
   { slug: 'gotong-royong-bersih-pantai', judul: 'Gotong Royong Bersih Pantai Loji Menyambut Musim Kunjungan', published_at: '2026-07-12', content_html: '<p>Warga bersama Karang Taruna membersihkan pesisir Pantai Loji dalam rangka menyambut meningkatnya kunjungan wisatawan ke kawasan Geopark Ciletuh.</p>', featured: true, img: '/images/gotong_royong.png' },
@@ -21,7 +25,10 @@ const getBeritaImg = (i: number) => {
 };
 
 const finalBerita = beritaList.length > 0
-  ? beritaList.map((b, i) => ({ slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', content_html: b.content_html, featured: i === 0, img: getBeritaImg(i) }))
+  ? beritaList.map((b, i) => {
+      const cover = covers.get(b.id);
+      return { slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', content_html: b.content_html, featured: i === 0, img: cover ? mediaUrl(cover) : getBeritaImg(i) };
+    })
   : demoBerita;
 
 const featuredBerita = finalBerita[0];
@@ -29,7 +36,7 @@ const restBerita = finalBerita.slice(1);
 ---
 
 <Layout
-  title="Berita — Desa Loji"
+  title="Berita | Desa Loji"
   description="Berita dan pengumuman resmi terbaru dari Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi."
 >
 

@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import AdminEditorToolbar from '../../../components/AdminEditorToolbar.astro';
 const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
 ---
 
@@ -35,24 +36,7 @@ const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
         <label class="block font-heading font-medium text-sm mb-1.5">
           Isi Berita <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
         </label>
-        <div class="border rounded-t-lg px-2 py-1.5 flex gap-1 flex-wrap" style="border-color:var(--color-border); background:#F8FAFC;">
-          {[
-            ['bold','B','tebal'],['italic','I','miring'],['underline','U','garis bawah'],
-          ].map(([cmd, lbl, title]) => (
-            <button type="button" data-cmd={cmd}
-              class="px-2 py-1 text-xs font-heading font-semibold rounded hover:bg-sand cursor-pointer border border-border"
-              title={title}>{lbl}</button>
-          ))}
-          <span class="w-px bg-border mx-1"></span>
-          {[
-            ['insertUnorderedList','Daftar •'],['insertOrderedList','Daftar 1.'],['formatBlock-h2','Sub-judul'],
-          ].map(([cmd, lbl]) => (
-            <button type="button" data-cmd={cmd}
-              class="px-2 py-1 text-xs font-heading rounded hover:bg-sand cursor-pointer border border-border">
-              {lbl}
-            </button>
-          ))}
-        </div>
+        <AdminEditorToolbar withImage />
         <div id="editor-isi" contenteditable="true"
           class="w-full min-h-64 border border-t-0 rounded-b-lg px-4 py-3 text-base focus:outline-none"
           style="border-color:var(--color-border);"
@@ -62,6 +46,8 @@ const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
       </div>
 
       <input type="hidden" name="_action" id="form-action" value="draft" />
+
+      <p class="text-xs text-text-muted italic">Simpan dulu, lalu tambahkan foto sampul dan galeri di halaman edit.</p>
 
       <!-- Sticky bottom bar -->
       <div class="sticky bottom-0 bg-white border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3 flex justify-end gap-3" style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
@@ -90,22 +76,18 @@ const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
   #editor-isi h2 { font-size:1.125rem; font-weight:700; margin:1rem 0 .25rem; }
   #editor-isi ul { list-style:disc; padding-left:1.5rem; }
   #editor-isi ol { list-style:decimal; padding-left:1.5rem; }
+  #editor-isi img { max-width:100%; height:auto; border-radius:.5rem; margin:.5rem 0; }
 </style>
 
 <script>
+  import { initEditor } from '../../../scripts/admin-editor';
+
   const form = document.getElementById('berita-form') as HTMLFormElement;
   const editor = document.getElementById('editor-isi') as HTMLDivElement;
   const hidden = document.getElementById('content_html') as HTMLInputElement;
   const actionInput = document.getElementById('form-action') as HTMLInputElement;
 
-  document.querySelectorAll('[data-cmd]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cmd = (btn as HTMLElement).dataset.cmd ?? '';
-      editor.focus();
-      if (cmd.startsWith('formatBlock-')) document.execCommand('formatBlock', false, cmd.split('-')[1]);
-      else document.execCommand(cmd, false);
-    });
-  });
+  initEditor(editor, hidden);
 
   function validateAndSubmit(action: string) {
     const judul = (document.getElementById('judul') as HTMLInputElement).value.trim();

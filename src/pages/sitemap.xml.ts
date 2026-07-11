@@ -1,18 +1,25 @@
 import { getEnv } from '@lib/env';
+import { SITE_URL } from '@lib/site';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ locals }) => {
+export const GET: APIRoute = async () => {
   const env = getEnv();
-  const base = 'https://desaloji.desa.id';
+  const base = SITE_URL;
 
   const staticUrls = [
     { loc: base, priority: '1.0', changefreq: 'weekly' },
     { loc: `${base}/profil`, priority: '0.8', changefreq: 'monthly' },
+    { loc: `${base}/pemerintahan`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/potensi`, priority: '0.8', changefreq: 'monthly' },
+    { loc: `${base}/potensi/pertanian`, priority: '0.7', changefreq: 'monthly' },
+    { loc: `${base}/potensi/perikanan`, priority: '0.7', changefreq: 'monthly' },
+    { loc: `${base}/potensi/pariwisata`, priority: '0.7', changefreq: 'monthly' },
+    { loc: `${base}/potensi/sdm`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/wisata`, priority: '0.9', changefreq: 'weekly' },
     { loc: `${base}/umkm`, priority: '0.9', changefreq: 'weekly' },
     { loc: `${base}/berita`, priority: '0.9', changefreq: 'daily' },
     { loc: `${base}/peta`, priority: '0.7', changefreq: 'monthly' },
+    { loc: `${base}/kontak`, priority: '0.6', changefreq: 'yearly' },
   ];
 
   const dynamicUrls: Array<{ loc: string; priority: string; changefreq: string; lastmod?: string }> = [];

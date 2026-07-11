@@ -12,10 +12,13 @@ const { title, breadcrumb, currentPath = Astro.url.pathname } = Astro.props;
 const menuItems = [
   { href: '/admin/dasbor',    label: 'Dasbor',          icon: 'grid' },
   { href: '/admin/konten',    label: 'Konten Halaman',  icon: 'file-text' },
+  { href: '/admin/wisata',    label: 'Wisata',          icon: 'compass' },
   { href: '/admin/umkm',      label: 'UMKM',            icon: 'shopping-bag' },
   { href: '/admin/peta',      label: 'Peta',            icon: 'map' },
   { href: '/admin/berita',    label: 'Berita',          icon: 'newspaper' },
   { href: '/admin/media',     label: 'Media',           icon: 'image' },
+  { href: '/admin/perangkat', label: 'Perangkat Desa',  icon: 'users' },
+  { href: '/admin/pengaturan',label: 'Pengaturan',      icon: 'settings' },
   { href: '/admin/statistik', label: 'Statistik',       icon: 'bar-chart' },
 ];
 
@@ -30,7 +33,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <title>{title} — Panel Admin Desa Loji</title>
+  <title>{title} | Panel Admin Desa Loji</title>
   <meta name="robots" content="noindex,nofollow" />
 </head>
 

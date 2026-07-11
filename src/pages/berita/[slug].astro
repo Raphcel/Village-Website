@@ -10,17 +10,33 @@ const env = getEnv();
 const berita = env ? await getBeritaBySlug(slug, env.DB) : null;
 if (!berita) return Astro.redirect('/404');
 
-const coverMedia = berita.cover_media_id && env
-  ? (await env.DB.prepare('SELECT * FROM media WHERE id = ?').bind(berita.cover_media_id).first<{r2_key_display:string;alt:string}>())
-  : null;
+const mediaList = env ? await getMediaForEntity('berita', berita.id, env.DB) : [];
+const coverMedia = mediaList[0];
 
-const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://desaloji.desa.id').href;
+import { SITE_URL, SITE_NAME } from '@lib/site';
+const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? SITE_URL).href;
+const plainDescription = berita.content_html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,160);
+
+// Structured data artikel untuk hasil pencarian Google
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: berita.judul,
+  description: plainDescription,
+  datePublished: berita.published_at ?? undefined,
+  dateModified: berita.updated_at ?? berita.published_at ?? undefined,
+  mainEntityOfPage: canonicalUrl,
+  ...(coverMedia && { image: new URL(`/api/media/${encodeURIComponent(coverMedia.r2_key_display)}`, Astro.site ?? SITE_URL).href }),
+  author: { '@type': 'Organization', name: `Pemerintah ${SITE_NAME}` },
+  publisher: { '@type': 'Organization', name: `Pemerintah ${SITE_NAME}`, url: SITE_URL },
+};
 ---
 
 <Layout
-  title={`${berita.judul} — Berita Desa Loji`}
-  description={berita.content_html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,160)}
+  title={`${berita.judul} | Berita Desa Loji`}
+  description={plainDescription}
   ogImage={coverMedia ? `/api/media/${encodeURIComponent(coverMedia.r2_key_display)}` : undefined}
+  jsonLd={articleJsonLd}
 >
 
   <!-- Header -->
@@ -61,6 +77,21 @@ const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://desaloji.
 
     <!-- Content -->
     <div class="prose max-w-none mb-10" set:html={berita.content_html} />
+
+    <!-- Gallery -->
+    {mediaList.length > 1 && (
+      <div class="mb-10">
+        <h2 class="font-heading font-semibold text-xl mb-4" style="color:var(--color-primary);">Galeri Foto</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {mediaList.slice(1).map(m => (
+            <div class="aspect-[4/3] rounded-lg overflow-hidden border border-border">
+              <img src={`/api/media/${encodeURIComponent(m.r2_key_display)}`} alt={m.alt}
+                class="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
 
     <!-- Share -->
     <div class="border-t border-border pt-6">

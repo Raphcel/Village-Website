@@ -2,23 +2,60 @@
 import '../styles/global.css';
 import Nav from './Nav.astro';
 import Footer from './Footer.astro';
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, GOOGLE_SITE_VERIFICATION } from '@lib/site';
 
 interface Props {
   title: string;
   description?: string;
   ogImage?: string;
   transparentNav?: boolean;
+  /** JSON-LD tambahan per halaman (mis. NewsArticle di detail berita) */
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title,
-  description = 'Situs resmi Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi.',
+  description = SITE_DESCRIPTION,
   ogImage,
   transparentNav = false,
+  jsonLd,
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://desaloji.desa.id').href;
+const site = Astro.site ?? new URL(SITE_URL);
+const canonicalUrl = new URL(Astro.url.pathname, site).href;
+const ogImageUrl = new URL(ogImage ?? '/images/pantai_loji.png', site).href;
 const currentPath = Astro.url.pathname;
+
+// Data organisasi untuk mesin pencari (schema.org)
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'GovernmentOrganization',
+  name: `Pemerintah ${SITE_NAME}`,
+  alternateName: ['Desa Loji', 'Desa Loji Sukabumi', 'Desa Loji Simpenan'],
+  url: SITE_URL,
+  email: 'desalojimaju@gmail.com',
+  logo: new URL('/favicon.svg', site).href,
+  areaServed: 'Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Jl. Raya Bojongkopo KM.02',
+    addressLocality: 'Simpenan',
+    addressRegion: 'Jawa Barat',
+    postalCode: '43361',
+    addressCountry: 'ID',
+  },
+};
+
+// Skema WebSite — memperkuat "Desa Loji" sebagai nama situs di hasil pencarian.
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  alternateName: 'Situs Resmi Desa Loji',
+  url: SITE_URL,
+  inLanguage: 'id-ID',
+  publisher: { '@type': 'GovernmentOrganization', name: `Pemerintah ${SITE_NAME}` },
+};
 ---
 
 <!DOCTYPE html>
@@ -38,19 +75,45 @@ const currentPath = Astro.url.pathname;
     <!-- Primary meta -->
     <title>{title}</title>
     <meta name="description" content={description} />
+    {GOOGLE_SITE_VERIFICATION && (
+      <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
+    )}
+    <link rel="canonical" href={canonicalUrl} />
+    <!-- Favicon (untuk logo di hasil pencarian Google & tab browser) -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0E4A6E" />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:image" content={ogImageUrl} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Structured data -->
+    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 
     <!-- Lucide icons -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
-    <!-- Cloudflare Web Analytics -->
+    {/* Cloudflare Web Analytics — aktifkan dengan mengganti token lalu buka comment:
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
       data-cf-beacon='{"token": "REPLACE_WITH_CF_ANALYTICS_TOKEN"}'></script>
+    */}
   </head>
 
   <body class="bg-bg text-text font-body min-h-screen">

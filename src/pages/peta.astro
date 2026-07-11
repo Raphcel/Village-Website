@@ -12,14 +12,11 @@ for (const t of titikList) {
   if (t.jenis in counts) counts[t.jenis as keyof typeof counts]++;
 }
 
+// Titik peta diisi lewat panel admin setelah pengambilan koordinat GPS di lapangan.
+// Koordinat di bawah bersifat perkiraan (fallback) sampai titik asli dimasukkan.
 const demoPoints = [
-  { jenis: 'wisata', label: 'Pantai Loji', lat: -7.0508, lng: 106.5444, linked_slug: 'pantai-loji', desc: 'Pantai pesisir selatan, gerbang Geopark.' },
-  { jenis: 'wisata', label: 'Kuil Dewi Kwan Im', lat: -7.0708, lng: 106.5301, linked_slug: 'kuil-dewi-kwan-im', desc: 'Vihara Nam Hai Kwan Se Im Pu Sa.' },
-  { jenis: 'wisata', label: 'Spot Sunset Karang', lat: -7.0550, lng: 106.5380, linked_slug: 'spot-sunset-karang', desc: 'Tebing karang untuk sunset.' },
-  { jenis: 'umkm', label: 'Sambal Ikan Loji', lat: -7.0450, lng: 106.5480, linked_slug: 'sambal-ikan-loji', desc: 'Kuliner — olahan ikan khas.' },
-  { jenis: 'umkm', label: 'Warung Seafood Mbak Sari', lat: -7.0480, lng: 106.5450, linked_slug: 'warung-seafood-mbak-sari', desc: 'Kuliner — hidangan laut segar.' },
-  { jenis: 'potensi', label: 'Area Tambak Perikanan', lat: -7.0380, lng: 106.5520, linked_slug: 'potensi', desc: 'Potensi perikanan desa.' },
-  { jenis: 'potensi', label: 'Kebun Kopi Loji', lat: -7.0320, lng: 106.5650, linked_slug: 'potensi', desc: 'Potensi perkebunan kopi.' },
+  { jenis: 'wisata', label: 'Pantai Loji', lat: -7.0508, lng: 106.5444, linked_slug: 'pantai-loji', desc: 'Garis pantai ±4 km di tepi Samudra Hindia.' },
+  { jenis: 'potensi', label: 'Kantor Desa Loji', lat: -7.059, lng: 106.578, linked_slug: 'profil', desc: 'Pusat pemerintahan Desa Loji, Kp. Bojongkopo.' },
 ];
 
 const finalPoints = titikList.length > 0 ? titikList : demoPoints;
@@ -30,7 +27,7 @@ const finalCounts = titikList.length > 0
 ---
 
 <Layout
-  title="Peta Desa — Desa Loji"
+  title="Peta Desa | Desa Loji"
   description="Peta interaktif Desa Loji: titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail."
 >
 

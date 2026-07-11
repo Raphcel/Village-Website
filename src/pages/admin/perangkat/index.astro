@@ -1,0 +1,88 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getPerangkatDesa } from '../../../lib/db/perangkat-desa';
+
+import { getEnv } from '@lib/env';
+const env = getEnv();
+const perangkatList = env ? await getPerangkatDesa(env.DB) : [];
+const saved = Astro.url.searchParams.get('saved');
+const deleted = Astro.url.searchParams.get('deleted');
+
+const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:40px;';
+---
+
+<AdminLayout title="Perangkat Desa" breadcrumb="Perangkat Desa">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Perangkat desa berhasil disimpan.
+    </div>
+  )}
+  {deleted && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Perangkat desa berhasil dihapus.
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Add form -->
+    <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+      <h2 class="font-heading font-bold text-xl mb-4" style="color:var(--color-primary);">Tambah Perangkat</h2>
+      <form method="POST" action="/api/admin/perangkat" class="space-y-4">
+        <div>
+          <label for="nama" class="block font-heading font-medium text-sm mb-1.5">Nama <span>*</span></label>
+          <input type="text" id="nama" name="nama" required class={inputCls} style={inputStyle} />
+        </div>
+        <div>
+          <label for="jabatan" class="block font-heading font-medium text-sm mb-1.5">Jabatan <span>*</span></label>
+          <input type="text" id="jabatan" name="jabatan" required class={inputCls} style={inputStyle} placeholder="cth. Kepala Desa" />
+        </div>
+        <div>
+          <label for="urutan" class="block font-heading font-medium text-sm mb-1.5">Urutan Tampil</label>
+          <input type="number" id="urutan" name="urutan" value={perangkatList.length} class={inputCls} style={inputStyle} />
+        </div>
+        <button type="submit" class="w-full rounded-lg font-heading font-semibold text-white py-2.5 cursor-pointer" style="background:var(--color-cta); min-height:44px;">
+          Tambah Perangkat
+        </button>
+      </form>
+    </div>
+
+    <!-- List -->
+    <div class="space-y-3">
+      {perangkatList.length === 0 ? (
+        <p class="text-center text-text-muted py-8 bg-white rounded-xl border border-border">Belum ada perangkat desa.</p>
+      ) : perangkatList.map(p => (
+        <div class="bg-white rounded-xl border border-border p-4" style="box-shadow:var(--shadow-sm);">
+          <form method="POST" action="/api/admin/perangkat" class="grid grid-cols-[1fr_1fr_70px] gap-2 items-end">
+            <input type="hidden" name="id" value={p.id} />
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Nama</label>
+              <input type="text" name="nama" value={p.nama} required class={inputCls} style={inputStyle} />
+            </div>
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Jabatan</label>
+              <input type="text" name="jabatan" value={p.jabatan} required class={inputCls} style={inputStyle} />
+            </div>
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Urutan</label>
+              <input type="number" name="urutan" value={p.urutan} class={inputCls} style={inputStyle} />
+            </div>
+            <div class="col-span-3 flex justify-end gap-2 mt-1">
+              <button type="submit" class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-sand" style="border-color:var(--color-border);">
+                Simpan
+              </button>
+            </div>
+          </form>
+          <form method="POST" action="/api/admin/perangkat/delete" onsubmit="return confirm('Hapus perangkat ini?')" class="mt-1 flex justify-end">
+            <input type="hidden" name="id" value={p.id} />
+            <button type="submit" class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600" style="border-color:#FECACA; color:#DC2626;">
+              Hapus
+            </button>
+          </form>
+        </div>
+      ))}
+    </div>
+  </div>
+
+</AdminLayout>

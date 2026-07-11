@@ -2,14 +2,16 @@
 import Layout from '../components/Layout.astro';
 import { getSection } from '../lib/db/page-section';
 import { getPerangkatDesa } from '../lib/db/perangkat-desa';
+import { getPengaturan } from '../lib/db/pengaturan';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const [visiMisi, ruangLingkup, tugasFungsi, perangkat] = await Promise.all([
+const [visiMisi, ruangLingkup, tugasFungsi, perangkat, s] = await Promise.all([
   env ? getSection('pemerintahan-visi-misi', env.DB) : null,
   env ? getSection('pemerintahan-ruang-lingkup', env.DB) : null,
   env ? getSection('pemerintahan-tugas-fungsi', env.DB) : null,
   env ? getPerangkatDesa(env.DB) : [],
+  env ? getPengaturan(env.DB) : {},
 ]);
 
 const tiers = {
@@ -18,20 +20,16 @@ const tiers = {
   others: perangkat.filter(p => !p.jabatan?.toLowerCase().includes('kepala desa') && !p.jabatan?.toLowerCase().includes('sekretaris')),
 };
 
-const demoStaff = [
-  { jabatan: 'Kepala Desa', nama: '[ Nama Kepala Desa ]', tier: 'kepala' },
-  { jabatan: 'Sekretaris Desa', nama: '[ Nama ]', tier: 'sekdes' },
-  { jabatan: 'Kaur Keuangan', nama: '[ Nama ]' },
-  { jabatan: 'Kaur Umum & TU', nama: '[ Nama ]' },
-  { jabatan: 'Kasi Pemerintahan', nama: '[ Nama ]' },
-  { jabatan: 'Kasi Kesejahteraan', nama: '[ Nama ]' },
-  { jabatan: 'Kasi Pelayanan', nama: '[ Nama ]' },
-  { jabatan: 'Kepala Dusun', nama: '[ Nama ]' },
-];
+const fmt = (n: number) => n.toLocaleString('id-ID');
+const stUmum = JSON.parse(s.stat_umum ?? '{}');
+const stDusun: { label: string; rw: string; jmlRw: number; l: number; p: number; kk: number }[] = JSON.parse(s.stat_dusun ?? '[]');
+const wilayahData = stDusun.map(d => ({ dusun: d.label, rw: d.rw, jmlRw: d.jmlRw, jiwa: d.l + d.p, kk: d.kk }));
+const totalJiwa = wilayahData.reduce((sum, d) => sum + d.jiwa, 0);
+const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
 ---
 
 <Layout
-  title="Pemerintahan Desa — Desa Loji"
+  title="Pemerintahan Desa | Desa Loji"
   description="Pemerintahan Desa Loji: perangkat desa, struktur organisasi, visi & misi, ruang lingkup, tugas & fungsi."
 >
 
@@ -211,11 +209,12 @@ const demoStaff = [
   <section id="ruang-lingkup" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Ruang Lingkup</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Loji, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
-    <div class="grid sm:grid-cols-3 gap-4 mt-4">
+    <div class="grid sm:grid-cols-4 gap-4 mt-4">
       {[
-        { icon: 'layers', label: 'Dusun', value: '5' },
-        { icon: 'grid-3x3', label: 'RW', value: '—' },
-        { icon: 'grid-2x2', label: 'RT', value: '—' },
+        { icon: 'layers', label: 'Dusun', value: String(wilayahData.length) },
+        { icon: 'grid-3x3', label: 'RW', value: String(stUmum.rw ?? '-') },
+        { icon: 'grid-2x2', label: 'RT', value: String(stUmum.rt ?? '-') },
+        { icon: 'users', label: 'Kepala Keluarga', value: fmt(totalKK) },
       ].map(item => (
         <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
           <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
@@ -224,6 +223,42 @@ const demoStaff = [
         </div>
       ))}
     </div>
+
+    <!-- Rincian per dusun -->
+    <div class="mt-6 overflow-x-auto rounded-xl border border-line">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-sand text-left">
+            <th class="px-4 py-3 font-heading font-semibold text-ink">Dusun</th>
+            <th class="px-4 py-3 font-heading font-semibold text-ink">RW</th>
+            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">Jumlah RW</th>
+            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">Penduduk (Jiwa)</th>
+            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">KK</th>
+          </tr>
+        </thead>
+        <tbody>
+          {wilayahData.map(d => (
+            <tr class="border-t border-line bg-white">
+              <td class="px-4 py-3 font-heading font-medium text-ink">Dusun {d.dusun}</td>
+              <td class="px-4 py-3 text-muted">{d.rw}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-muted">{d.jmlRw}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-ink">{fmt(d.jiwa)}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-ink">{fmt(d.kk)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr class="border-t-2 border-line bg-sand/60">
+            <td class="px-4 py-3 font-heading font-bold text-primary">Total</td>
+            <td class="px-4 py-3 text-muted">{stUmum.rw ?? '-'} RW</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{stUmum.rw ?? '-'}</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalJiwa)}</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalKK)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="text-xs text-muted mt-2">Total {stUmum.rt ?? '-'} RT tersebar di {stUmum.rw ?? '-'} RW pada {wilayahData.length} dusun tersebut.</p>
   </section>
 
   <!-- Tugas & Fungsi -->

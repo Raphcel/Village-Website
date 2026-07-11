@@ -4,18 +4,20 @@ import { getAllSections } from '../../../lib/db/page-section';
 
 import { getEnv } from '@lib/env';
 const env = getEnv();
-const sections = env ? await getAllSections(env.DB) : [];
+// 'potensi' section: halaman /potensi kini berupa kartu-kartu terancang, tidak
+// membaca section ini — disembunyikan agar admin tidak mengedit konten yang tak tampil.
+const sections = (env ? await getAllSections(env.DB) : []).filter(s => s.slug !== 'potensi');
 
 const sectionLabels: Record<string, string> = {
-  'beranda-hero':                'Beranda — Hero',
-  'beranda-sekilas':             'Beranda — Sekilas Desa',
-  'profil-umum':                 'Profil — Umum',
-  'profil-geografis':            'Profil — Geografis',
-  'profil-sejarah':              'Profil — Sejarah',
+  'beranda-hero':                'Beranda: Hero',
+  'beranda-sekilas':             'Beranda: Sekilas Desa',
+  'profil-umum':                 'Profil: Umum',
+  'profil-geografis':            'Profil: Geografis',
+  'profil-sejarah':              'Profil: Sejarah',
   'potensi':                     'Potensi Desa',
-  'pemerintahan-visi-misi':      'Pemerintahan — Visi & Misi',
-  'pemerintahan-ruang-lingkup':  'Pemerintahan — Ruang Lingkup',
-  'pemerintahan-tugas-fungsi':   'Pemerintahan — Tugas & Fungsi',
+  'pemerintahan-visi-misi':      'Pemerintahan: Visi & Misi',
+  'pemerintahan-ruang-lingkup':  'Pemerintahan: Ruang Lingkup',
+  'pemerintahan-tugas-fungsi':   'Pemerintahan: Tugas & Fungsi',
 };
 ---
 

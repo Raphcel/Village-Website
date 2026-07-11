@@ -12,11 +12,12 @@ if (!umkm) return Astro.redirect('/404');
 
 const mediaList = env ? await getMediaForEntity('umkm', umkm.id, env.DB) : [];
 const cover = mediaList[0];
-const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://desaloji.desa.id').href;
+import { SITE_URL } from '@lib/site';
+const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
 ---
 
 <Layout
-  title={`${umkm.nama} — UMKM Desa Loji`}
+  title={`${umkm.nama} | UMKM Desa Loji`}
   description={`${umkm.nama} · ${umkm.kategori} · ${umkm.lokasi ?? 'Desa Loji'}`}
   ogImage={cover ? `/api/media/${encodeURIComponent(cover.r2_key_display)}` : undefined}
 >
@@ -138,7 +139,7 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://desaloji.de
           <div class="pt-3 border-t border-border">
             <p class="text-text-muted text-xs font-heading mb-2">Bagikan</p>
             <div class="flex gap-2">
-              <a href={`https://wa.me/?text=${encodeURIComponent(umkm.nama + ' — ' + canonicalUrl)}`}
+              <a href={`https://wa.me/?text=${encodeURIComponent(umkm.nama + ': ' + canonicalUrl)}`}
                 target="_blank" rel="noopener noreferrer" aria-label="Bagikan via WhatsApp"
                 class="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-sand focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>

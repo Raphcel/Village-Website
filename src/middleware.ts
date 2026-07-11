@@ -8,7 +8,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isAdminPage = pathname.startsWith('/admin');
   const isAdminApi = pathname.startsWith('/api/admin');
 
-  // Public auth endpoints — must stay reachable WITHOUT an existing session.
+  // Public auth endpoints: must stay reachable WITHOUT an existing session.
   // (setup self-guards: it only works while no admin user exists.)
   const isLoginPage = pathname === '/admin/login';
   const isSetupPage = pathname === '/admin/setup';
@@ -22,7 +22,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (needsAuth) {
     const env = getEnv();
 
-    if (!env) return next(); // local dev without runtime — allow through
+    if (!env) return next(); // local dev without runtime, allow through
 
     const sessionId = context.cookies.get(SESSION_COOKIE)?.value;
     const username = sessionId ? await validateSession(sessionId, env.SESSION_KV) : null;

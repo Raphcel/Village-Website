@@ -1,18 +1,38 @@
 ---
 import Layout from '../components/Layout.astro';
 import { getSection } from '../lib/db/page-section';
+import { getPengaturan } from '../lib/db/pengaturan';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const [umum, geografis, sejarah] = await Promise.all([
+const [umum, geografis, sejarah, s] = await Promise.all([
   env ? getSection('profil-umum', env.DB) : null,
   env ? getSection('profil-geografis', env.DB) : null,
   env ? getSection('profil-sejarah', env.DB) : null,
+  env ? getPengaturan(env.DB) : {},
 ]);
+
+const fmt = (n: number) => n.toLocaleString('id-ID');
+const barPct = (v: number, max: number) => Math.max(4, Math.round((v / max) * 100));
+
+const stUmum = JSON.parse(s.stat_umum ?? '{}');
+const dusunData: { label: string; l: number; p: number; kk: number }[] = JSON.parse(s.stat_dusun ?? '[]');
+const dusunMax = Math.max(1, ...dusunData.flatMap(d => [d.l, d.p]));
+
+const totalPenduduk = dusunData.reduce((sum, d) => sum + d.l + d.p, 0);
+
+const umurData: { label: string; value: number }[] = JSON.parse(s.stat_umur ?? '[]');
+const umurMax = Math.max(1, ...umurData.map(d => d.value));
+
+const pendidikanData: { label: string; value: number }[] = JSON.parse(s.stat_pendidikan ?? '[]');
+const pendidikanMax = Math.max(1, ...pendidikanData.map(d => d.value));
+
+const pencaharianData: { label: string; value: number }[] = JSON.parse(s.stat_pencaharian ?? '[]');
+const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
 ---
 
 <Layout
-  title="Profil Desa — Desa Loji"
+  title="Profil Desa | Desa Loji"
   description="Profil lengkap Desa Loji: sejarah, kondisi geografis, visi misi, dan gambaran desa pesisir Kecamatan Simpenan Sukabumi."
 >
 
@@ -45,6 +65,7 @@ const [umum, geografis, sejarah] = await Promise.all([
     {[
       ['#umum', 'Umum'],
       ['#geografis', 'Geografis'],
+      ['#demografi', 'Demografi'],
       ['#sejarah', 'Sejarah'],
       ['#peta', 'Peta'],
       ['/pemerintahan', 'Pemerintahan ↗'],
@@ -64,16 +85,16 @@ const [umum, geografis, sejarah] = await Promise.all([
   <!-- Stats -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
     {[
-      { icon: 'users', label: 'Penduduk', value: '±4.500', sub: 'Jiwa' },
-      { icon: 'layers', label: 'Wilayah', value: '±2.500', sub: 'Hektar' },
-      { icon: 'home', label: 'Dusun', value: '5', sub: 'Wilayah' },
-      { icon: 'store', label: 'UMKM', value: '12+', sub: 'Terdaftar' },
-    ].map(s => (
+      { icon: 'users', label: 'Penduduk', value: fmt(totalPenduduk), sub: 'Jiwa' },
+      { icon: 'layers', label: 'Wilayah', value: stUmum.luas ?? '-', sub: 'Hektar' },
+      { icon: 'home', label: 'Dusun', value: String(dusunData.length), sub: 'Wilayah' },
+      { icon: 'map-pin', label: 'RW / RT', value: `${stUmum.rw ?? '-'} / ${stUmum.rt ?? '-'}`, sub: 'Administratif' },
+    ].map(tile => (
       <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
-        <i data-lucide={s.icon} class="w-6 h-6 text-accent"></i>
-        <p class="font-heading font-extrabold text-2xl text-primary mt-2">{s.value}</p>
-        <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{s.sub}</p>
-        <p class="text-sm text-ink mt-0.5">{s.label}</p>
+        <i data-lucide={tile.icon} class="w-6 h-6 text-accent"></i>
+        <p class="font-heading font-extrabold text-2xl text-primary mt-2">{tile.value}</p>
+        <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{tile.sub}</p>
+        <p class="text-sm text-ink mt-0.5">{tile.label}</p>
       </div>
     ))}
   </div>
@@ -82,7 +103,7 @@ const [umum, geografis, sejarah] = await Promise.all([
   <section id="umum" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Profil Umum</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Desa Loji adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai salah satu pintu masuk menuju kawasan Geopark Ciletuh — geopark pertama di Jawa yang diakui oleh UNESCO Global Geoparks.
+      Desa Loji adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus bagian dari penyangga kawasan Geopark Ciletuh-Palabuhanratu.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={umum?.content_html ?? ''} />
     <div class="grid sm:grid-cols-2 gap-4 mt-6">
@@ -90,7 +111,7 @@ const [umum, geografis, sejarah] = await Promise.all([
         { label: 'Kecamatan', value: 'Simpenan' },
         { label: 'Kabupaten', value: 'Sukabumi' },
         { label: 'Provinsi', value: 'Jawa Barat' },
-        { label: 'Kode Pos', value: '43179' },
+        { label: 'Kode Pos', value: '43361' },
       ].map(row => (
         <div class="flex justify-between py-3 border-b border-line">
           <span class="font-heading font-semibold text-ink">{row.label}</span>
@@ -109,9 +130,9 @@ const [umum, geografis, sejarah] = await Promise.all([
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={geografis?.content_html ?? ''} />
     <div class="grid sm:grid-cols-3 gap-4 mt-6">
       {[
-        { icon: 'mountain', label: 'Ketinggian', value: '0–250 m dpl' },
+        { icon: 'mountain', label: 'Ketinggian', value: '0 sampai 250 m dpl' },
         { icon: 'thermometer', label: 'Iklim', value: 'Tropis Basah' },
-        { icon: 'waves', label: 'Garis Pantai', value: '±8 km' },
+        { icon: 'waves', label: 'Garis Pantai', value: '±4 km' },
       ].map(item => (
         <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
           <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
@@ -119,6 +140,137 @@ const [umum, geografis, sejarah] = await Promise.all([
           <p class="font-heading font-bold text-xl text-primary mt-0.5">{item.value}</p>
         </div>
       ))}
+    </div>
+  </section>
+
+  <!-- Demografi (sumber: Profil Desa Loji / RPJMDes 2026 dan rekap penduduk April 2026) -->
+  <section id="demografi" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Demografi Penduduk</h2>
+    <p class="text-muted mt-2 max-w-3xl leading-relaxed">
+      Data kependudukan Desa Loji per dusun, golongan umur, tingkat pendidikan, dan mata pencaharian, berdasarkan rekapitulasi Pemerintah Desa Loji tahun 2026.
+    </p>
+
+    <div class="mt-6 space-y-10">
+
+      <!-- Penduduk per dusun -->
+      <div>
+        <h3 class="font-heading font-bold text-lg text-primary mb-1">Penduduk per Dusun</h3>
+        <div class="flex items-center gap-4 mb-3 text-sm text-muted">
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-accent);"></span>Laki-laki</span>
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-cta);"></span>Perempuan</span>
+        </div>
+        <div class="space-y-4">
+          {dusunData.map(d => (
+            <div>
+              <div class="flex items-baseline justify-between mb-1">
+                <span class="font-heading font-semibold text-sm text-ink">Dusun {d.label}</span>
+                <span class="text-xs text-muted">{fmt(d.l + d.p)} jiwa · {fmt(d.kk)} KK</span>
+              </div>
+              <div class="flex items-center gap-2 mb-1">
+                <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                  <div class="h-full" style={`width:${barPct(d.l, dusunMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+                </div>
+                <span class="w-14 shrink-0 text-right text-xs font-heading font-semibold text-ink tabular-nums">{fmt(d.l)}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                  <div class="h-full" style={`width:${barPct(d.p, dusunMax)}%; background:var(--color-cta); border-radius:0 4px 4px 0;`}></div>
+                </div>
+                <span class="w-14 shrink-0 text-right text-xs font-heading font-semibold text-ink tabular-nums">{fmt(d.p)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Golongan umur -->
+      <div>
+        <h3 class="font-heading font-bold text-lg text-primary mb-3">Golongan Umur</h3>
+        <div class="space-y-2">
+          {umurData.map(d => (
+            <div class="flex items-center gap-3">
+              <span class="w-28 shrink-0 text-sm text-ink">{d.label}</span>
+              <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                <div class="h-full" style={`width:${barPct(d.value, umurMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+              </div>
+              <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Tingkat pendidikan -->
+      <div>
+        <h3 class="font-heading font-bold text-lg text-primary mb-3">Tingkat Pendidikan</h3>
+        <div class="space-y-2">
+          {pendidikanData.map(d => (
+            <div class="flex items-center gap-3">
+              <span class="w-40 shrink-0 text-sm text-ink">{d.label}</span>
+              <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                <div class="h-full" style={`width:${barPct(d.value, pendidikanMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+              </div>
+              <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Mata pencaharian -->
+      <div>
+        <h3 class="font-heading font-bold text-lg text-primary mb-3">Mata Pencaharian</h3>
+        <div class="space-y-2">
+          {pencaharianData.map(d => (
+            <div class="flex items-center gap-3">
+              <span class="w-52 shrink-0 text-sm text-ink">{d.label}</span>
+              <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                <div class="h-full" style={`width:${barPct(d.value, pencaharianMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+              </div>
+              <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Tabel data (aksesibilitas) -->
+      <details class="border border-line rounded-xl p-4">
+        <summary class="font-heading font-semibold text-sm text-primary cursor-pointer">Lihat semua data dalam bentuk tabel</summary>
+        <div class="mt-4 grid sm:grid-cols-2 gap-6 text-sm">
+          <table class="w-full">
+            <caption class="text-left font-heading font-semibold mb-1">Penduduk per Dusun</caption>
+            <thead><tr class="text-muted text-xs"><th class="text-left font-normal py-1">Dusun</th><th class="text-right font-normal">L</th><th class="text-right font-normal">P</th><th class="text-right font-normal">KK</th></tr></thead>
+            <tbody>
+              {dusunData.map(d => (
+                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.l)}</td><td class="text-right tabular-nums">{fmt(d.p)}</td><td class="text-right tabular-nums">{fmt(d.kk)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <table class="w-full">
+            <caption class="text-left font-heading font-semibold mb-1">Golongan Umur</caption>
+            <tbody>
+              {umurData.map(d => (
+                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <table class="w-full">
+            <caption class="text-left font-heading font-semibold mb-1">Tingkat Pendidikan</caption>
+            <tbody>
+              {pendidikanData.map(d => (
+                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <table class="w-full">
+            <caption class="text-left font-heading font-semibold mb-1">Mata Pencaharian</caption>
+            <tbody>
+              {pencaharianData.map(d => (
+                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+
     </div>
   </section>
 

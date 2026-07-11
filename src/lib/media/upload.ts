@@ -32,7 +32,7 @@ export async function saveMedia(
 export async function getMediaUrl(key: string, bucket: R2Bucket): Promise<string | null> {
   const obj = await bucket.get(key);
   if (!obj) return null;
-  // Return a signed or public URL — for now return the R2 public URL pattern
+  // Return a signed or public URL. For now, return the R2 public URL pattern
   // In production this would use a custom domain or R2 public access
   return `/api/media/${encodeURIComponent(key)}`;
 }

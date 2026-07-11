@@ -97,7 +97,7 @@ const titikJson = JSON.stringify(titikList);
           <tr><td colspan="5" class="px-4 py-8 text-center text-text-muted">Belum ada titik peta.</td></tr>
         ) : titikList.map(t => (
           <tr class="border-b border-border last:border-0 hover:bg-sand/30">
-            <td class="px-4 py-3 font-medium">{t.label ?? '—'}</td>
+            <td class="px-4 py-3 font-medium">{t.label ?? '-'}</td>
             <td class="px-4 py-3">
               <span class:list={['inline-flex px-2 py-0.5 rounded-full text-xs font-medium',
                 t.jenis === 'wisata'  ? 'bg-cyan-100 text-cyan-700' :

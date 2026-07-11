@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => 
 
   const env = getEnv();
   if (!env) {
-    // Local dev without runtime — allow admin/admin for testing
+    // Local dev without runtime, allow admin/admin for testing
     if (username === 'admin' && password === 'admin') {
       const sessionId = generateSessionId();
       cookies.set(SESSION_COOKIE, sessionId, {
@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => 
   }
 
   // ── Rate limiting: max 5 failed attempts per IP in a 15-minute window ──
-  // Skip when IP is unknown (direct origin hit bypassing Cloudflare) — a
+  // Skip when IP is unknown (direct origin hit bypassing Cloudflare), since a
   // shared 'unknown' key would let one attacker lock out all users.
   const ip = request.headers.get('CF-Connecting-IP');
   const rlKey = ip ? `ratelimit:login:${ip}` : null;

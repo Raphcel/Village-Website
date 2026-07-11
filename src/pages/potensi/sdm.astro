@@ -1,0 +1,124 @@
+---
+import Layout from '../../components/Layout.astro';
+
+const fmt = (n: number) => n.toLocaleString('id-ID');
+
+// Sumber: Profil Desa Loji / RPJMDes 2026
+const organisasi = [
+  { icon: 'landmark', nama: 'Badan Permusyawaratan Desa (BPD)', desc: '9 anggota mewakili keempat kedusunan, menetapkan peraturan desa bersama Kepala Desa.' },
+  { icon: 'handshake', nama: 'Lembaga Pemberdayaan Masyarakat Desa (LPMD)', desc: 'Mendampingi perencanaan dan pelaksanaan pembangunan desa bersama warga.' },
+  { icon: 'sparkles', nama: 'Karang Taruna Loji', desc: 'Wadah generasi muda desa di bidang kepemudaan, seni, olahraga, dan kegiatan sosial.' },
+  { icon: 'book-open', nama: 'Majelis Ulama Indonesia (MUI) Desa', desc: 'Membina kegiatan keagamaan, dakwah, dan pendidikan Islam di tingkat desa.' },
+  { icon: 'heart-handshake', nama: 'PKK (Pemberdayaan Kesejahteraan Keluarga)', desc: 'Program pemberdayaan perempuan dan keluarga di setiap dusun.' },
+  { icon: 'stethoscope', nama: 'Posyandu', desc: '22 unit tersebar di seluruh dusun, melayani kesehatan ibu, anak, dan lansia.' },
+  { icon: 'moon-star', nama: 'Remaja Masjid & Jamiyah Yasin/Tahlil', desc: 'Kegiatan keagamaan rutin yang aktif di tingkat kampung dan RW.' },
+  { icon: 'wheat', nama: 'Kelompok Tani', desc: '17 kelompok tani tersebar di seluruh wilayah desa, mendukung sektor pertanian.' },
+  { icon: 'briefcase', nama: 'BUMDes', desc: 'Badan Usaha Milik Desa yang mengelola potensi ekonomi dan permodalan untuk warga.' },
+];
+
+const prasarana = [
+  { icon: 'stethoscope', label: 'Posyandu', value: '22 unit' },
+  { icon: 'user-round', label: 'Bidan Desa', value: '2 orang' },
+  { icon: 'school', label: 'SD / MI', value: '7 / 1 unit' },
+  { icon: 'graduation-cap', label: 'SLTP / MTs', value: '1 / 2 unit' },
+  { icon: 'graduation-cap', label: 'SLTA / MA', value: '1 / 1 unit' },
+  { icon: 'book-open', label: 'TPA / TPQ', value: '4 unit' },
+  { icon: 'landmark', label: 'Masjid', value: '22 unit' },
+  { icon: 'home', label: 'Mushola', value: '48 unit' },
+];
+---
+
+<Layout
+  title="Potensi Sumber Daya Manusia | Desa Loji"
+  description="Potensi SDM Desa Loji: kelembagaan dan organisasi masyarakat, angkatan kerja, serta prasarana pendidikan dan kesehatan."
+>
+
+<section class="relative">
+  <div class="h-48 sm:h-64 overflow-hidden">
+    <img
+      src="/images/nelayan.png"
+      alt="Warga dan kegiatan masyarakat Desa Loji"
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
+  <div class="absolute inset-0 flex items-end">
+    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
+      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
+        <a href="/" class="hover:text-white">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/potensi" class="hover:text-white">Potensi</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="font-medium">Sumber Daya Manusia</span>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Potensi Sumber Daya Manusia</h1>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10 space-y-12">
+
+  <div class="max-w-3xl space-y-4">
+    <p class="text-lg text-muted leading-relaxed">
+      Kekuatan Desa Loji tidak hanya terletak pada alam dan potensi ekonominya, tetapi juga pada masyarakat yang aktif berorganisasi. Berbagai lembaga dan kelompok masyarakat tumbuh di setiap dusun, menjadi mitra pemerintah desa dalam pembangunan dan pemberdayaan warga.
+    </p>
+  </div>
+
+  <!-- Angkatan kerja -->
+  <div class="grid sm:grid-cols-3 gap-4">
+    {[
+      { icon: 'users', label: 'Angkatan Kerja (15-55 tahun)', value: fmt(3440) },
+      { icon: 'briefcase', label: 'Kepala Keluarga', value: fmt(4355) },
+      { icon: 'graduation-cap', label: 'Penduduk (15-55) Belum Bekerja', value: fmt(1295) },
+    ].map(item => (
+      <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)] text-center">
+        <i data-lucide={item.icon} class="w-8 h-8 text-accent mx-auto"></i>
+        <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
+        <p class="text-sm text-muted mt-0.5">{item.label}</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Kelembagaan & organisasi -->
+  <div>
+    <h2 class="text-2xl font-heading font-extrabold text-primary mb-1">Kelembagaan & Organisasi Masyarakat</h2>
+    <p class="text-muted mb-6 max-w-2xl">Lembaga dan kelompok masyarakat yang aktif menjadi mitra pembangunan Desa Loji.</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {organisasi.map(o => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+          <i data-lucide={o.icon} class="w-6 h-6 text-cta"></i>
+          <p class="font-heading font-bold text-ink mt-2">{o.nama}</p>
+          <p class="text-sm text-muted mt-1 leading-relaxed">{o.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Prasarana pendidikan & kesehatan -->
+  <div>
+    <h2 class="text-2xl font-heading font-extrabold text-primary mb-1">Prasarana Pendidikan & Kesehatan</h2>
+    <p class="text-muted mb-6 max-w-2xl">Fasilitas yang menopang kualitas sumber daya manusia di Desa Loji.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {prasarana.map(item => (
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+          <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
+          <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
+          <p class="font-heading font-bold text-lg text-primary mt-0.5">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="mt-2">
+    <a href="/kontak" class="inline-flex items-center gap-2 bg-cta text-white font-heading font-semibold px-5 py-3 rounded-lg hover:bg-ctaDark transition-colors">
+      <i data-lucide="handshake" class="w-5 h-5"></i> Hubungi untuk Kolaborasi
+    </a>
+  </div>
+
+</main>
+
+</Layout>
+
+<script is:inline>
+  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
+</script>

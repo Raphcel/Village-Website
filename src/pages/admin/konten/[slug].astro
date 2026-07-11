@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import AdminEditorToolbar from '../../../components/AdminEditorToolbar.astro';
 import { getSection } from '../../../lib/db/page-section';
 
 const { slug } = Astro.params as { slug: string };
@@ -43,23 +44,8 @@ const sectionLabel = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase
         <label for="content_html" class="block font-heading font-medium text-sm mb-1.5">
           Konten
         </label>
-        <!-- Simple rich text toolbar -->
-        <div class="border rounded-t-lg px-2 py-1.5 flex gap-1 flex-wrap" style="border-color:var(--color-border); background:#F8FAFC;">
-          {['Bold', 'Italic', 'Underline'].map(cmd => (
-            <button type="button" data-cmd={cmd.toLowerCase()}
-              class="px-2 py-1 text-xs font-heading font-semibold rounded hover:bg-sand transition-colors cursor-pointer border border-border"
-              title={cmd} aria-label={cmd}>
-              {cmd === 'Bold' ? 'B' : cmd === 'Italic' ? 'I' : 'U'}
-            </button>
-          ))}
-          <span class="w-px bg-border mx-1"></span>
-          {[['insertUnorderedList','Daftar •'],['insertOrderedList','Daftar 1.'],['formatBlock-h2','Sub-judul']].map(([cmd, label]) => (
-            <button type="button" data-cmd={cmd}
-              class="px-2 py-1 text-xs font-heading rounded hover:bg-sand transition-colors cursor-pointer border border-border">
-              {label}
-            </button>
-          ))}
-        </div>
+        <AdminEditorToolbar withImage />
+
         <div
           id="editor"
           contenteditable="true"
@@ -93,27 +79,17 @@ const sectionLabel = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase
   #editor ul { list-style:disc; padding-left:1.5rem; }
   #editor ol { list-style:decimal; padding-left:1.5rem; }
   #editor p { margin:.25rem 0; }
+  #editor img { max-width:100%; height:auto; border-radius:.5rem; margin:.5rem 0; }
 </style>
 
 <script>
+  import { initEditor } from '../../../scripts/admin-editor';
+
   const editor = document.getElementById('editor') as HTMLDivElement;
   const hidden = document.getElementById('content_html') as HTMLInputElement;
 
-  // Sync editor content to hidden input before submit
   document.querySelector('form')?.addEventListener('submit', () => {
     hidden.value = editor.innerHTML;
   });
-
-  // Toolbar commands
-  document.querySelectorAll('[data-cmd]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cmd = (btn as HTMLElement).dataset.cmd ?? '';
-      editor.focus();
-      if (cmd.startsWith('formatBlock-')) {
-        document.execCommand('formatBlock', false, cmd.split('-')[1]);
-      } else {
-        document.execCommand(cmd, false);
-      }
-    });
-  });
+  initEditor(editor, hidden);
 </script>

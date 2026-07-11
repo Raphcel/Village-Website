@@ -15,8 +15,8 @@ const coverImage = mediaList[0];
 ---
 
 <Layout
-  title={`${wisata.nama} — Wisata Desa Loji`}
-  description={wisata.deskripsi_html.replace(/<[^>]+>/g, '').slice(0, 160)}
+  title={`${wisata.nama} | Wisata Desa Loji`}
+  description={wisata.deskripsi_html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)}
   ogImage={coverImage ? `/api/media/${encodeURIComponent(coverImage.r2_key_display)}` : undefined}
 >
 

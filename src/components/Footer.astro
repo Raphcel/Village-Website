@@ -1,4 +1,18 @@
 ---
+import { getPengaturan } from '../lib/db/pengaturan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const s = env ? await getPengaturan(env.DB) : {};
+
+const sosial = [
+  { key: 'sosial_whatsapp', label: 'WhatsApp resmi desa', hover: 'hover:bg-cta',
+    icon: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>' },
+  { key: 'sosial_facebook', label: 'Facebook resmi desa', hover: 'hover:bg-accent',
+    icon: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>' },
+  { key: 'sosial_instagram', label: 'Instagram resmi desa', hover: 'hover:bg-accent',
+    icon: '<rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>' },
+].filter(x => s[x.key]);
 ---
 
 <footer style="background-color: var(--color-primary-dark);" class="text-white/90">
@@ -38,51 +52,39 @@
         <li class="flex items-start gap-2">
           <!-- map-pin icon -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          Kantor Desa Loji, Kec. Simpenan, Sukabumi
+          {s.kontak_alamat}
         </li>
         <li class="flex items-center gap-2">
           <!-- phone icon -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 9.81 19.79 19.79 0 0 1 1.08 1.18 2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          (0266) 000-0000
+          {s.kontak_telepon}
         </li>
         <li class="flex items-center gap-2">
           <!-- mail icon -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-          desaloji@email.desa.id
+          {s.kontak_email}
         </li>
       </ul>
     </div>
 
     <!-- Kanal Resmi -->
-    <div>
-      <h3 class="font-heading font-semibold text-white mb-3">Kanal Resmi</h3>
-      <div class="flex gap-3">
-        <a
-          href="#"
-          aria-label="WhatsApp resmi desa"
-          class="w-10 h-10 rounded-full bg-white/10 hover:bg-cta grid place-items-center transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-2"
-        >
-          <!-- WhatsApp / message-circle icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-        </a>
-        <a
-          href="#"
-          aria-label="Facebook resmi desa"
-          class="w-10 h-10 rounded-full bg-white/10 hover:bg-accent grid place-items-center transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-2"
-        >
-          <!-- Facebook icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-        </a>
-        <a
-          href="#"
-          aria-label="Instagram resmi desa"
-          class="w-10 h-10 rounded-full bg-white/10 hover:bg-accent grid place-items-center transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-2"
-        >
-          <!-- Instagram icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-        </a>
+    {sosial.length > 0 && (
+      <div>
+        <h3 class="font-heading font-semibold text-white mb-3">Kanal Resmi</h3>
+        <div class="flex gap-3">
+          {sosial.map(item => (
+            <a
+              href={s[item.key]}
+              target="_blank" rel="noopener noreferrer"
+              aria-label={item.label}
+              class:list={['w-10 h-10 rounded-full bg-white/10 grid place-items-center transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-2', item.hover]}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={item.icon} />
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
+    )}
 
   </div>
 

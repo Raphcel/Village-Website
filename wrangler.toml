@@ -23,7 +23,7 @@ id = "12efcdd486e54c86a30f5db20351a1ab"
 # ─── Cron triggers (dinonaktifkan) ───────────────────────────────────────────
 # Backup mingguan otomatis dimatikan. Backup dilakukan manual lewat tombol
 # export di panel admin (lihat docs handover). Untuk mengaktifkan lagi:
-# isi crons = ["0 0 * * 0"] — butuh workers.dev subdomain akun terdaftar.
+# isi crons = ["0 0 * * 0"], butuh workers.dev subdomain akun terdaftar.
 [triggers]
 crons = []
 

@@ -1,25 +1,18 @@
 ---
 import Layout from '../../components/Layout.astro';
 import { getPublishedUmkm } from '../../lib/db/umkm';
+import { getCoversForType, mediaUrl } from '../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const allUmkm = env ? await getPublishedUmkm(env.DB) : [];
+const [allUmkm, covers] = await Promise.all([
+  env ? getPublishedUmkm(env.DB) : [],
+  env ? getCoversForType('umkm', env.DB) : new Map(),
+]);
 
-const demoUmkm = [
-  { slug: 'sambal-ikan-loji', nama: 'Sambal Ikan Loji', kategori: 'Kuliner', lokasi: 'Kp. Cibutun', img: '/images/ikan_bakar.png', wa_number: '6281234567890', desc: 'Olahan sambal ikan khas pesisir, pedas dan segar.' },
-  { slug: 'kerupuk-ikan-bu-eni', nama: 'Kerupuk Ikan Bu Eni', kategori: 'Kuliner', lokasi: 'Kp. Loji', img: '/images/ikan_bakar.png', wa_number: '6281234567891', desc: 'Camilan kerupuk ikan renyah khas Desa Loji.' },
-  { slug: 'kopi-kebun-loji', nama: 'Kopi Kebun Loji', kategori: 'Hasil Tani', lokasi: 'Kp. Cikadal', img: '/images/kebun_sayur.png', wa_number: null, desc: 'Biji kopi hasil kebun setempat dengan cita rasa khas.' },
-  { slug: 'anyaman-bambu-diding', nama: 'Anyaman Bambu Pak Diding', kategori: 'Kriya', lokasi: 'Kp. Loji', img: '/images/kerajinan_bambu.png', wa_number: '6281234567892', desc: 'Kerajinan anyaman bambu tangan bermotif khas tradisi.' },
-  { slug: 'batik-pesisir-loji', nama: 'Batik Pesisir Loji', kategori: 'Kriya', lokasi: 'Kp. Cibutun', img: '/images/kerajinan_bambu.png', wa_number: '6281234567893', desc: 'Kain batik motif laut dan geopark khas Desa Loji.' },
-  { slug: 'warung-seafood-mbak-sari', nama: 'Warung Seafood Mbak Sari', kategori: 'Kuliner', lokasi: 'Pantai Loji', img: '/images/ikan_bakar.png', wa_number: '6281234567894', desc: 'Hidangan laut segar tepi pantai dengan view langsung ke laut.' },
-  { slug: 'jasa-pemandu-wisata', nama: 'Jasa Pemandu Wisata Loji', kategori: 'Jasa', lokasi: 'Balai Desa', img: '/images/pantai_loji.png', wa_number: '6281234567895', desc: 'Pemandu lokal berpengalaman ke Geopark Ciletuh dan sekitarnya.' },
-  { slug: 'homestay-bahari', nama: 'Homestay Bahari', kategori: 'Jasa', lokasi: 'Kp. Loji', img: '/images/pantai_loji.png', wa_number: '6281234567896', desc: 'Penginapan sederhana dekat pantai dengan suasana desa nelayan.' },
-  { slug: 'madu-hutan-simpenan', nama: 'Madu Hutan Simpenan', kategori: 'Hasil Tani', lokasi: 'Kp. Cikadal', img: '/images/kebun_sayur.png', wa_number: '6281234567897', desc: 'Madu murni asli dari lebah hutan di kawasan perbukitan.' },
-  { slug: 'ikan-asin-nelayan', nama: 'Ikan Asin Nelayan Loji', kategori: 'Hasil Tani', lokasi: 'Pantai Loji', img: '/images/ikan_bakar.png', wa_number: '6281234567898', desc: 'Ikan asin segar hasil tangkapan nelayan langsung dari Pantai Loji.' },
-  { slug: 'keripik-pisang-bu-wati', nama: 'Keripik Pisang Bu Wati', kategori: 'Kuliner', lokasi: 'Kp. Cikadal', img: '/images/kebun_sayur.png', wa_number: '6281234567899', desc: 'Keripik pisang aneka rasa hasil olahan rumahan.' },
-  { slug: 'tenun-souvenir-loji', nama: 'Tenun Souvenir Loji', kategori: 'Kriya', lokasi: 'Kp. Cibutun', img: '/images/kerajinan_bambu.png', wa_number: null, desc: 'Suvenir tenun khas desa dengan motif pesisir Sukabumi.' },
-];
+// Direktori UMKM diisi lewat panel admin (hasil pendataan door-to-door DIGDAYA).
+// Kosong = tampilkan empty state, bukan data contoh.
+const demoUmkm: Array<{slug:string;nama:string;kategori:string;lokasi:string;img:string;wa_number:string|null;desc:string}> = [];
 
 const getUmkmImg = (slug: string) => {
   if (slug === 'kerajinan-bambu-loji') return '/images/kerajinan_bambu.png';
@@ -29,7 +22,10 @@ const getUmkmImg = (slug: string) => {
 };
 
 const displayUmkm = allUmkm.length > 0
-  ? allUmkm.map(u => ({ slug: u.slug, nama: u.nama, kategori: u.kategori, lokasi: u.lokasi ?? '', img: getUmkmImg(u.slug), wa_number: u.wa_number ?? null, desc: '' }))
+  ? allUmkm.map(u => {
+      const cover = covers.get(u.id);
+      return { slug: u.slug, nama: u.nama, kategori: u.kategori, lokasi: u.lokasi ?? '', img: cover ? mediaUrl(cover) : getUmkmImg(u.slug), wa_number: u.wa_number ?? null, desc: '' };
+    })
   : demoUmkm;
 
 const displayJson = JSON.stringify(displayUmkm);
@@ -37,7 +33,7 @@ const totalCount = displayUmkm.length;
 ---
 
 <Layout
-  title="Direktori UMKM — Desa Loji"
+  title="Direktori UMKM | Desa Loji"
   description="Direktori UMKM Desa Loji: temukan produk kuliner, kriya, jasa, dan hasil tani lokal beserta kontak langsung."
 >
 

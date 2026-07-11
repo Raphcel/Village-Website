@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   await upsertSection(slug, { title, content_html }, env.DB);
 
   // Purge relevant public cache paths
-  const purgePaths = ['/', '/profil', '/potensi'];
+  const purgePaths = ['/', '/profil', '/potensi', '/pemerintahan'];
   await purgeCache(purgePaths);
 
   return redirect(`/admin/konten/${slug}?saved=1`);

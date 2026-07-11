@@ -1,0 +1,171 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+import { getPengaturan } from '../../lib/db/pengaturan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const s = env ? await getPengaturan(env.DB) : {};
+const saved = Astro.url.searchParams.get('saved');
+
+const stUmum = JSON.parse(s.stat_umum ?? '{}');
+const dusun = JSON.parse(s.stat_dusun ?? '[]');
+const umur = JSON.parse(s.stat_umur ?? '[]');
+const pendidikan = JSON.parse(s.stat_pendidikan ?? '[]');
+const pencaharian = JSON.parse(s.stat_pencaharian ?? '[]');
+
+const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:40px;';
+---
+
+<AdminLayout title="Pengaturan" breadcrumb="Pengaturan">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Pengaturan berhasil disimpan.
+    </div>
+  )}
+
+  <div class="max-w-3xl space-y-8">
+
+    <!-- Kontak & Media Sosial -->
+    <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+      <h2 class="font-heading font-bold text-xl mb-1" style="color:var(--color-primary);">Kontak & Media Sosial</h2>
+      <p class="text-xs text-text-muted mb-4">Ditampilkan di footer semua halaman dan halaman Kontak. Kosongkan tautan sosial yang belum aktif.</p>
+      <form method="POST" action="/api/admin/pengaturan" class="space-y-4">
+        <input type="hidden" name="_form" value="kontak" />
+        <div>
+          <label for="kontak_alamat" class="block font-heading font-medium text-sm mb-1.5">Alamat Kantor</label>
+          <input type="text" id="kontak_alamat" name="kontak_alamat" value={s.kontak_alamat ?? ''} class={inputCls} style={inputStyle} />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="kontak_telepon" class="block font-heading font-medium text-sm mb-1.5">Telepon</label>
+            <input type="text" id="kontak_telepon" name="kontak_telepon" value={s.kontak_telepon ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label for="kontak_email" class="block font-heading font-medium text-sm mb-1.5">Email</label>
+            <input type="email" id="kontak_email" name="kontak_email" value={s.kontak_email ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+        </div>
+        <div>
+          <label for="kontak_jam" class="block font-heading font-medium text-sm mb-1.5">Jam Layanan</label>
+          <input type="text" id="kontak_jam" name="kontak_jam" value={s.kontak_jam ?? ''} class={inputCls} style={inputStyle} />
+        </div>
+        <fieldset class="border border-border rounded-lg p-4">
+          <legend class="font-heading font-semibold text-sm px-2">Media Sosial (kosongkan bila belum aktif)</legend>
+          <div class="space-y-3">
+            {[
+              ['sosial_whatsapp', 'URL WhatsApp', 'https://wa.me/62...'],
+              ['sosial_facebook', 'URL Facebook', 'https://facebook.com/...'],
+              ['sosial_instagram', 'URL Instagram', 'https://instagram.com/...'],
+            ].map(([name, label, placeholder]) => (
+              <div>
+                <label for={name} class="block font-heading font-medium text-sm mb-1">{label}</label>
+                <input type="url" id={name} name={name} value={s[name] ?? ''} placeholder={placeholder} class={inputCls} style={inputStyle} />
+              </div>
+            ))}
+          </div>
+        </fieldset>
+        <button type="submit" class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer" style="background:var(--color-cta); min-height:44px;">
+          Simpan Kontak
+        </button>
+      </form>
+    </div>
+
+    <!-- Statistik Desa -->
+    <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+      <h2 class="font-heading font-bold text-xl mb-1" style="color:var(--color-primary);">Statistik Desa</h2>
+      <p class="text-xs text-text-muted mb-4">Tampil di halaman Profil, Pemerintahan, dan Beranda. Total penduduk/KK dihitung otomatis dari data per dusun.</p>
+      <form method="POST" action="/api/admin/pengaturan" class="space-y-6">
+        <input type="hidden" name="_form" value="statistik" />
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label for="luas" class="block font-heading font-medium text-sm mb-1.5">Luas Wilayah (ha)</label>
+            <input type="text" id="luas" name="luas" value={stUmum.luas ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label for="rw" class="block font-heading font-medium text-sm mb-1.5">Jumlah RW</label>
+            <input type="number" id="rw" name="rw" value={stUmum.rw ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label for="rt" class="block font-heading font-medium text-sm mb-1.5">Jumlah RT</label>
+            <input type="number" id="rt" name="rt" value={stUmum.rt ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-heading font-semibold text-sm mb-2">Penduduk per Dusun</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-text-muted text-xs">
+                  <th class="pb-1 pr-2">Nama Dusun</th>
+                  <th class="pb-1 pr-2">RW</th>
+                  <th class="pb-1 pr-2">Jml RW</th>
+                  <th class="pb-1 pr-2">Laki-laki</th>
+                  <th class="pb-1 pr-2">Perempuan</th>
+                  <th class="pb-1">KK</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dusun.map((d: any) => (
+                  <tr>
+                    <td class="pr-2 py-1"><input type="text" name="dusun_label" value={d.label} class={inputCls} style={inputStyle} /></td>
+                    <td class="pr-2 py-1"><input type="text" name="dusun_rw" value={d.rw} class={inputCls} style={inputStyle} /></td>
+                    <td class="pr-2 py-1 w-20"><input type="number" name="dusun_jmlRw" value={d.jmlRw} class={inputCls} style={inputStyle} /></td>
+                    <td class="pr-2 py-1"><input type="number" name="dusun_l" value={d.l} class={inputCls} style={inputStyle} /></td>
+                    <td class="pr-2 py-1"><input type="number" name="dusun_p" value={d.p} class={inputCls} style={inputStyle} /></td>
+                    <td class="py-1"><input type="number" name="dusun_kk" value={d.kk} class={inputCls} style={inputStyle} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-heading font-semibold text-sm mb-2">Golongan Umur</h3>
+          <div class="space-y-2">
+            {umur.map((u: any) => (
+              <div class="grid grid-cols-3 gap-2">
+                <input type="text" name="umur_label" value={u.label} class={`${inputCls} col-span-2`} style={inputStyle} />
+                <input type="number" name="umur_value" value={u.value} class={inputCls} style={inputStyle} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-heading font-semibold text-sm mb-2">Tingkat Pendidikan</h3>
+          <div class="space-y-2">
+            {pendidikan.map((p: any) => (
+              <div class="grid grid-cols-3 gap-2">
+                <input type="text" name="pendidikan_label" value={p.label} class={`${inputCls} col-span-2`} style={inputStyle} />
+                <input type="number" name="pendidikan_value" value={p.value} class={inputCls} style={inputStyle} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-heading font-semibold text-sm mb-2">Mata Pencaharian</h3>
+          <div class="space-y-2">
+            {pencaharian.map((p: any) => (
+              <div class="grid grid-cols-3 gap-2">
+                <input type="text" name="pencaharian_label" value={p.label} class={`${inputCls} col-span-2`} style={inputStyle} />
+                <input type="number" name="pencaharian_value" value={p.value} class={inputCls} style={inputStyle} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button type="submit" class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer" style="background:var(--color-cta); min-height:44px;">
+          Simpan Statistik
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+</AdminLayout>

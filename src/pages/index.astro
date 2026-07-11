@@ -3,28 +3,39 @@ import Layout from '../components/Layout.astro';
 import { getPublishedWisata } from '../lib/db/wisata';
 import { getPublishedUmkm } from '../lib/db/umkm';
 import { getPublishedBerita, formatTanggal, excerpt } from '../lib/db/berita';
+import { getPengaturan } from '../lib/db/pengaturan';
+import { getSection } from '../lib/db/page-section';
+import { getCoversForType, mediaUrl } from '../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
 
-const [wisataList, umkmList, beritaList] = await Promise.all([
+const [wisataList, umkmList, beritaList, s, petaCounts, hero, sekilas, wisataCovers, umkmCovers, beritaCovers] = await Promise.all([
   env ? getPublishedWisata(env.DB) : [],
   env ? getPublishedUmkm(env.DB) : [],
   env ? getPublishedBerita(env.DB, 3) : [],
+  env ? getPengaturan(env.DB) : {},
+  env ? env.DB.prepare('SELECT jenis, COUNT(*) AS n FROM titik_peta GROUP BY jenis').all<{ jenis: string; n: number }>() : { results: [] },
+  env ? getSection('beranda-hero', env.DB) : null,
+  env ? getSection('beranda-sekilas', env.DB) : null,
+  env ? getCoversForType('wisata', env.DB) : new Map(),
+  env ? getCoversForType('umkm', env.DB) : new Map(),
+  env ? getCoversForType('berita', env.DB) : new Map(),
 ]);
 
+const fmt = (n: number) => n.toLocaleString('id-ID');
+const dusunData: { l: number; p: number }[] = JSON.parse(s.stat_dusun ?? '[]');
+const dusunCount = dusunData.length;
+const totalPenduduk = dusunData.reduce((sum, d) => sum + d.l + d.p, 0);
+const petaCountByJenis = Object.fromEntries(petaCounts.results.map(r => [r.jenis, r.n]));
+
 const demoWisata = [
-  { slug: 'pantai-loji', nama: 'Pantai Loji', img: '/images/pantai_loji.png', tag: 'Pantai', desc: 'Pantai pesisir selatan yang memukau, gerbang utama menuju Geopark Ciletuh.' },
-  { slug: 'kuil-dewi-kwan-im', nama: 'Kuil Dewi Kwan Im', img: '/images/karang_sari.png', tag: 'Budaya', desc: 'Vihara Nam Hai Kwan Se Im Pu Sa dengan arsitektur khas Tionghoa di tepi pantai.' },
-  { slug: 'geopark-ciletuh', nama: 'Geopark Ciletuh', img: '/images/pantai_loji.png', tag: 'Alam', desc: 'Kawasan geopark kelas dunia dengan pemandangan tebing, laut, dan flora unik.' },
+  { slug: 'pantai-loji', nama: 'Pantai Loji', img: '/images/pantai_loji.png', tag: 'Pantai', desc: 'Garis pantai sepanjang ±4 km di tepi Samudra Hindia, bagian kawasan Geopark Ciletuh-Palabuhanratu.' },
+  { slug: 'danau-talanca', nama: 'Danau Talanca', img: '/images/pantai_loji.png', tag: 'Wisata Air', desc: 'Danau seluas 20 hektar berpotensi untuk wisata air dan perikanan.' },
+  { slug: 'puncak-gelendrung', nama: 'Puncak Gelendrung', img: '/images/pantai_loji.png', tag: 'Alam', desc: 'Puncak di kawasan Gunung Rompang yang cocok untuk wisata alam dan paralayang.' },
 ];
 
-const demoUmkm: Array<{slug:string;nama:string;kategori:string;img:string;wa:string|null;desc:string}> = [
-  { slug: 'sambal-ikan-loji', nama: 'Sambal Ikan Loji', kategori: 'Kuliner', img: '/images/ikan_bakar.png', wa: '6281234567890', desc: 'Olahan sambal ikan khas pesisir Desa Loji, pedas dan segar.' },
-  { slug: 'anyaman-bambu-diding', nama: 'Anyaman Bambu Pak Diding', kategori: 'Kriya', img: '/images/kerajinan_bambu.png', wa: '6281234567891', desc: 'Kerajinan anyaman bambu tangan bermotif khas tradisi Sunda.' },
-  { slug: 'kopi-kebun-loji', nama: 'Kopi Kebun Loji', kategori: 'Hasil Tani', img: '/images/kebun_sayur.png', wa: null, desc: 'Biji kopi pilihan hasil kebun setempat dengan cita rasa khas.' },
-  { slug: 'ikan-asin-nelayan', nama: 'Ikan Asin Nelayan Loji', kategori: 'Hasil Laut', img: '/images/ikan_bakar.png', wa: '6281234567892', desc: 'Ikan asin segar hasil tangkapan nelayan Pantai Loji.' },
-];
+const demoUmkm: Array<{slug:string;nama:string;kategori:string;img:string;wa:string|null;desc:string}> = [];
 
 const demoBerita = [
   { slug: 'gotong-royong-bersih-pantai', judul: 'Gotong Royong Bersih Pantai Loji Menyambut Musim Kunjungan', published_at: '2026-07-12', img: '/images/gotong_royong.png', ringkasan: 'Warga bersama Karang Taruna membersihkan pesisir Pantai Loji dalam rangka menyambut meningkatnya kunjungan wisatawan.' },
@@ -46,20 +57,29 @@ const getUmkmImg = (slug: string) => {
 };
 
 const finalWisata = wisataList.length > 0
-  ? wisataList.slice(0, 3).map(w => ({ slug: w.slug, nama: w.nama, img: getWisataImg(w.slug), tag: 'Wisata', desc: excerpt(w.deskripsi_html, 100) }))
+  ? wisataList.slice(0, 3).map(w => {
+      const cover = wisataCovers.get(w.id);
+      return { slug: w.slug, nama: w.nama, img: cover ? mediaUrl(cover) : getWisataImg(w.slug), tag: 'Wisata', desc: excerpt(w.deskripsi_html, 100) };
+    })
   : demoWisata;
 
 const finalUmkm = umkmList.length > 0
-  ? umkmList.slice(0, 4).map(u => ({ slug: u.slug, nama: u.nama, kategori: u.kategori, img: getUmkmImg(u.slug), wa: u.wa_number ?? null, desc: u.deskripsi_html ? excerpt(u.deskripsi_html, 80) : '' }))
+  ? umkmList.slice(0, 4).map(u => {
+      const cover = umkmCovers.get(u.id);
+      return { slug: u.slug, nama: u.nama, kategori: u.kategori, img: cover ? mediaUrl(cover) : getUmkmImg(u.slug), wa: u.wa_number ?? null, desc: u.deskripsi_html ? excerpt(u.deskripsi_html, 80) : '' };
+    })
   : demoUmkm;
 
 const finalBerita = beritaList.length > 0
-  ? beritaList.map(b => ({ slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', img: '/images/gotong_royong.png', ringkasan: excerpt(b.content_html, 120) }))
+  ? beritaList.map(b => {
+      const cover = beritaCovers.get(b.id);
+      return { slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', img: cover ? mediaUrl(cover) : '/images/gotong_royong.png', ringkasan: excerpt(b.content_html, 120) };
+    })
   : demoBerita;
 ---
 
 <Layout
-  title="Desa Loji — Gerbang Geopark Ciletuh, Sukabumi"
+  title="Desa Loji - Website Desa"
   description="Situs resmi Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi. Jelajahi wisata bahari, UMKM lokal, dan potensi desa pesisir yang memukau."
   transparentNav={true}
 >
@@ -89,9 +109,10 @@ const finalBerita = beritaList.length > 0
     <h1 id="hero-heading" class="font-heading font-extrabold text-white text-4xl sm:text-5xl lg:text-6xl leading-tight max-w-2xl">
       Jelajahi<br/>Desa Loji
     </h1>
-    <p class="text-white/85 text-lg mt-3 max-w-xl">
-      Pesisir selatan Sukabumi yang memukau — wisata bahari, kearifan lokal, dan UMKM pesisir yang hidup.
-    </p>
+    <div
+      class="text-white/85 text-lg mt-3 max-w-xl"
+      set:html={hero?.content_html ?? '<p>Desa pesisir di Kecamatan Simpenan, Sukabumi, gerbang menuju Geopark Ciletuh-Palabuhanratu. Pantai sepanjang 4 km, kearifan lokal, dan UMKM warga yang terus berkembang.</p>'}
+    />
     <div class="flex flex-wrap gap-3 mt-6">
       <a href="/wisata" class="inline-flex items-center gap-2 bg-accent hover:bg-[#0a7d88] text-white font-heading font-semibold px-5 py-3 rounded-lg transition-colors min-h-[44px]">
         <i data-lucide="compass" class="w-5 h-5"></i> Mulai Jelajahi
@@ -136,13 +157,14 @@ const finalBerita = beritaList.length > 0
 
 <!-- ── Selamat Datang (editorial intro, centered) ──────────────── -->
 <section class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-16 pb-6 text-center" aria-labelledby="welcome-heading">
-  <span class="text-accent font-heading font-semibold">Selamat Datang</span>
+  <span class="text-accent font-heading font-semibold">Selamat Datang di Desa Loji</span>
   <h2 id="welcome-heading" class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2 max-w-2xl mx-auto leading-tight">
-    Desa pesisir yang ramah, kaya alam, dan terbuka untuk dunia
+    {sekilas?.title ?? 'Desa pesisir yang ramah, kaya alam, dan terbuka untuk dunia'}
   </h2>
-  <p class="text-muted text-lg mt-4 max-w-2xl mx-auto">
-    Terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Desa Loji adalah salah satu gerbang menuju Geopark Ciletuh — dengan pantai, budaya, dan UMKM yang siap menyambut Anda.
-  </p>
+  <div
+    class="text-muted text-lg mt-4 max-w-2xl mx-auto"
+    set:html={sekilas?.content_html ?? `<p>Berdiri sejak 1976 di Kecamatan Simpenan, Kabupaten Sukabumi, Desa Loji dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus rumah bagi ${fmt(totalPenduduk)} warga di ${dusunCount} dusun. Dengan garis pantai sepanjang 4 km dan posisinya sebagai gerbang Geopark Ciletuh-Palabuhanratu, Loji menyambut siapa pun yang ingin menikmati wisata bahari, mengenal budaya pesisir, dan mendukung UMKM lokal.</p>`}
+  />
 </section>
 
 <!-- ── Hal yang Bisa Dilakukan (1 big + 2 small cards) ──────────── -->
@@ -168,25 +190,25 @@ const finalBerita = beritaList.length > 0
         <div class="absolute bottom-0 p-6 text-white">
           <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-accent/90">{finalWisata[0]?.tag ?? 'Pantai'}</span>
           <h3 class="font-heading font-bold text-2xl mt-2">{finalWisata[0]?.nama ?? 'Pantai Loji'}</h3>
-          <p class="text-white/85 mt-1 max-w-md">{finalWisata[0]?.desc ?? 'Pasir, ombak selatan, dan matahari terbenam — titik awal menjelajah Geopark Ciletuh.'}</p>
+          <p class="text-white/85 mt-1 max-w-md">{finalWisata[0]?.desc ?? 'Pasir, ombak selatan, dan matahari terbenam: titik awal menjelajah Geopark Ciletuh.'}</p>
         </div>
       </a>
       <!-- Two small cards (right) -->
       <div class="grid sm:grid-cols-2 gap-6">
-        <a href={`/wisata/${finalWisata[1]?.slug ?? 'kuil-dewi-kwan-im'}`}
+        <a href={`/wisata/${finalWisata[1]?.slug ?? 'danau-talanca'}`}
            class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] hover:border-accent transition-all">
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src={finalWisata[1]?.img || '/images/karang_sari.png'}
-              alt={finalWisata[1]?.nama ?? 'Kuil Dewi Kwan Im'}
+              alt={finalWisata[1]?.nama ?? 'Danau Talanca'}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
           </div>
           <div class="p-5">
             <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[1]?.tag ?? 'Budaya'}</span>
-            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[1]?.nama ?? 'Kuil Dewi Kwan Im'}</h3>
-            <p class="text-sm text-muted mt-1">{finalWisata[1]?.desc ?? 'Vihara Nam Hai Kwan Se Im Pu Sa, ikon pesisir Loji.'}</p>
+            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[1]?.nama ?? 'Danau Talanca'}</h3>
+            <p class="text-sm text-muted mt-1">{finalWisata[1]?.desc ?? 'Danau 20 hektar untuk wisata air dan perikanan.'}</p>
           </div>
         </a>
         <a href={`/wisata/${finalWisata[2]?.slug ?? 'geopark-ciletuh'}`}
@@ -277,13 +299,13 @@ const finalBerita = beritaList.length > 0
       <span class="text-[13px] font-heading font-semibold text-accent uppercase tracking-widest">Peta Desa</span>
       <h2 id="peta-heading" class="font-heading font-extrabold text-3xl sm:text-4xl mt-2">Temukan Semua yang Ada di Loji</h2>
       <p class="text-white/80 mt-3 leading-relaxed">
-        Jelajahi peta interaktif Desa Loji — titik wisata, UMKM, dan potensi alam ditandai langsung di peta. Klik penanda untuk detail dan rute.
+        Jelajahi peta interaktif Desa Loji: titik wisata, UMKM, dan potensi alam ditandai langsung di peta. Klik penanda untuk detail dan rute.
       </p>
       <div class="flex flex-wrap gap-4 mt-6">
         {[
-          { icon: 'palmtree', label: '6 Wisata', color: '#0E9AA7' },
-          { icon: 'store', label: '12 UMKM', color: '#15803D' },
-          { icon: 'sprout', label: '3 Potensi', color: '#F4EBDD' },
+          { icon: 'palmtree', label: `${petaCountByJenis.wisata ?? 0} Wisata`, color: '#0E9AA7' },
+          { icon: 'store', label: `${petaCountByJenis.umkm ?? 0} UMKM`, color: '#15803D' },
+          { icon: 'sprout', label: `${petaCountByJenis.potensi ?? 0} Potensi`, color: '#F4EBDD' },
         ].map(item => (
           <span class="flex items-center gap-2 text-sm text-white/80">
             <i data-lucide={item.icon} class="w-4 h-4" style={`color:${item.color}`}></i>

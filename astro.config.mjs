@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
 
 export default defineConfig({
+  site: 'https://loji.web.id',
   output: 'server',
   adapter: cloudflare(),
   integrations: [react()],
