@@ -12,6 +12,8 @@ if (!umkm) return Astro.redirect('/404');
 
 const mediaList = env ? await getMediaForEntity('umkm', umkm.id, env.DB) : [];
 const cover = mediaList[0];
+const menuItems = (umkm.menu ?? '').split('\n').map(s => s.trim()).filter(Boolean);
+const caraPesanLines = (umkm.cara_pesan ?? '').split('\n').map(s => s.trim()).filter(Boolean);
 import { SITE_URL } from '@lib/site';
 const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
 ---
@@ -64,8 +66,31 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
           </div>
         )}
 
-        <!-- Description -->
-        <div class="prose max-w-none mb-6" set:html={umkm.deskripsi_html} />
+        <!-- Description + structured sections -->
+        <div class="umkm-content mb-6">
+          <div class="prose max-w-none" set:html={umkm.deskripsi_html} />
+
+          {menuItems.length > 0 && (
+            <section>
+              <h2>Produk</h2>
+              <ul>{menuItems.map(item => <li>{item}</li>)}</ul>
+            </section>
+          )}
+
+          {umkm.jam_buka && (
+            <section>
+              <h2>Jam Buka</h2>
+              <p>{umkm.jam_buka}</p>
+            </section>
+          )}
+
+          {caraPesanLines.length > 0 && (
+            <section>
+              <h2>Cara Pesan &amp; Pembayaran</h2>
+              {caraPesanLines.map(line => <p>{line}</p>)}
+            </section>
+          )}
+        </div>
 
         <!-- Location -->
         {umkm.lokasi && (
@@ -172,7 +197,20 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
   });
 </script>
 
-<style>
-  .prose h2 { font-size:1.125rem; font-weight:700; color:var(--color-primary); margin:1rem 0 .5rem; }
-  .prose p { margin:.5rem 0; line-height:1.7; }
+<!-- is:global: konten set:html tidak mendapat atribut scoping Astro, jadi selector scoped tidak mengenainya -->
+<style is:global>
+  .umkm-content h2 {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    border-left: 3px solid var(--color-accent);
+    padding-left: .625rem;
+    margin: 1.75rem 0 .625rem;
+  }
+  .umkm-content p { margin: .5rem 0; line-height: 1.7; }
+  .umkm-content ul { list-style: disc; padding-left: 1.5rem; margin: .5rem 0; }
+  .umkm-content ol { list-style: decimal; padding-left: 1.5rem; margin: .5rem 0; }
+  .umkm-content li { margin: .3rem 0; line-height: 1.6; }
+  .umkm-content .prose > p:first-child { font-size: 1.0625rem; }
 </style>

@@ -13,6 +13,9 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const data = {
     nama, kategori,
     deskripsi_html: (fd.get('deskripsi_html') as string) ?? '',
+    menu: (fd.get('menu') as string)?.trim() || null,
+    jam_buka: (fd.get('jam_buka') as string)?.trim() || null,
+    cara_pesan: (fd.get('cara_pesan') as string)?.trim() || null,
     lokasi: (fd.get('lokasi') as string) || null,
     wa_number: (fd.get('wa_number') as string) || null,
     telepon: (fd.get('telepon') as string) || null,

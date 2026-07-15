@@ -73,12 +73,17 @@ Menu **Wisata** mengelola destinasi (Pantai Loji, Vihara, Geopark Ciletuh, dst).
 
 Menu **UMKM** mengelola direktori usaha warga.
 
-1. **Tambah UMKM** → isi **Nama usaha**, **Kategori**, **Lokasi**, dan **Deskripsi** (produk, harga kisaran, keunggulan).
-2. Bagian **Identitas Digital** — isi hanya yang aktif, kolom kosong tidak ditampilkan:
+1. **Tambah UMKM** → isi **Nama usaha**, **Kategori**, dan **Lokasi**.
+2. Isi tulisan halaman per bagian — kolom yang kosong tidak akan ditampilkan di situs:
+   - **Tentang UMKM**: 1–2 paragraf pembuka — apa usahanya dan apa keunikannya.
+   - **Produk & Menu Andalan**: satu produk per baris berikut harga, contoh: `Kopi tubruk — Rp8.000`.
+   - **Jam Buka**: satu baris, contoh: `Setiap hari 07.00–21.00 WIB`.
+   - **Cara Pesan & Pembayaran**: contoh: `Datang langsung atau pesan antar via WhatsApp. Menerima QRIS.`
+3. Bagian **Identitas Digital** — isi hanya yang aktif, kolom kosong tidak ditampilkan:
    - **Nomor WhatsApp** (pembeli bisa langsung chat dari situs)
    - Telepon, URL Google Maps, URL Toko Online (Shopee/Tokopedia)
-3. Tambahkan **foto produk** di halaman edit (sampul + galeri).
-4. Status **Terbitkan** → tampil di direktori UMKM.
+4. Tambahkan **foto produk** di halaman edit (sampul + galeri).
+5. Status **Terbitkan** → tampil di direktori UMKM.
 
 ## 7. Peta
 

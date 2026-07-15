@@ -6,6 +6,9 @@ export interface Umkm {
   nama: string;
   kategori: string;
   deskripsi_html: string;
+  menu: string | null;
+  jam_buka: string | null;
+  cara_pesan: string | null;
   lokasi: string | null;
   wa_number: string | null;
   telepon: string | null;
@@ -46,9 +49,10 @@ export async function createUmkm(
     slug = `${baseSlug}-${i++}`;
   }
   const r = await db.prepare(
-    `INSERT INTO umkm (slug,nama,kategori,deskripsi_html,lokasi,wa_number,telepon,google_maps_url,qris_r2_key,toko_online_url,status)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING id`
-  ).bind(slug, data.nama, data.kategori, data.deskripsi_html, data.lokasi, data.wa_number,
+    `INSERT INTO umkm (slug,nama,kategori,deskripsi_html,menu,jam_buka,cara_pesan,lokasi,wa_number,telepon,google_maps_url,qris_r2_key,toko_online_url,status)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id`
+  ).bind(slug, data.nama, data.kategori, data.deskripsi_html, data.menu, data.jam_buka, data.cara_pesan,
+         data.lokasi, data.wa_number,
          data.telepon, data.google_maps_url, data.qris_r2_key, data.toko_online_url, data.status)
    .first<{ id: number }>();
   return { id: r!.id, slug };
@@ -60,10 +64,11 @@ export async function updateUmkm(
   db: D1Database
 ): Promise<void> {
   await db.prepare(
-    `UPDATE umkm SET nama=?,kategori=?,deskripsi_html=?,lokasi=?,wa_number=?,telepon=?,
+    `UPDATE umkm SET nama=?,kategori=?,deskripsi_html=?,menu=?,jam_buka=?,cara_pesan=?,lokasi=?,wa_number=?,telepon=?,
      google_maps_url=?,qris_r2_key=?,toko_online_url=?,status=?,updated_at=datetime('now')
      WHERE id=?`
-  ).bind(data.nama, data.kategori, data.deskripsi_html, data.lokasi, data.wa_number,
+  ).bind(data.nama, data.kategori, data.deskripsi_html, data.menu, data.jam_buka, data.cara_pesan,
+         data.lokasi, data.wa_number,
          data.telepon, data.google_maps_url, data.qris_r2_key, data.toko_online_url,
          data.status, id).run();
 }

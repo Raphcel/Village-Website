@@ -59,13 +59,37 @@ const categories = ['Kuliner', 'Kriya', 'Jasa', 'Hasil Tani'];
       </div>
 
       <div>
-        <label class="block font-heading font-medium text-sm mb-1.5">Deskripsi</label>
+        <label class="block font-heading font-medium text-sm mb-1.5">Tentang UMKM</label>
+        <p class="text-xs text-text-muted mb-1.5">Paragraf pembuka: apa usahanya dan apa keunikannya. Menu, jam buka, dan cara pesan diisi di kolom bawah.</p>
         <AdminEditorToolbar />
         <div id="editor" contenteditable="true"
           class="w-full min-h-32 border border-t-0 rounded-b-lg px-4 py-3 text-base focus:outline-none"
           style="border-color:var(--color-border);"
           set:html={umkm.deskripsi_html}></div>
         <input type="hidden" id="deskripsi_html" name="deskripsi_html" value={umkm.deskripsi_html} />
+      </div>
+
+      <div>
+        <label for="menu" class="block font-heading font-medium text-sm mb-1.5">Produk &amp; Menu Andalan</label>
+        <p class="text-xs text-text-muted mb-1.5">Satu produk per baris, cth: Kopi tubruk — Rp8.000</p>
+        <textarea id="menu" name="menu" rows="5"
+          class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+          style="border-color:var(--color-border);">{umkm.menu ?? ''}</textarea>
+      </div>
+
+      <div>
+        <label for="jam_buka" class="block font-heading font-medium text-sm mb-1.5">Jam Buka</label>
+        <input type="text" id="jam_buka" name="jam_buka" value={umkm.jam_buka ?? ''}
+          class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+          style="border-color:var(--color-border); min-height:44px;"
+          placeholder="cth. Setiap hari 07.00–21.00 WIB" />
+      </div>
+
+      <div>
+        <label for="cara_pesan" class="block font-heading font-medium text-sm mb-1.5">Cara Pesan &amp; Pembayaran</label>
+        <textarea id="cara_pesan" name="cara_pesan" rows="3"
+          class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+          style="border-color:var(--color-border);">{umkm.cara_pesan ?? ''}</textarea>
       </div>
 
       <fieldset class="border border-border rounded-xl p-4">
